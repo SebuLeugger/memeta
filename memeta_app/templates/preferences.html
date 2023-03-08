@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %} 
+    Training starten
+{% endblock %}
+
+{% block content %}
+
+{% if user == preferences.user %}
+    <h1>Training starten</h1>
+
+    <p>
+        Dein Stapel wurde aus Karten zu  
+        {% if preferences.courses.count == 1 %}
+            diesem Kurs zusammengestellt:
+        {% elif preferences.courses.count >= 1 %}
+            diesen {{ preferences.courses.count }} Kursen zusammengestellt:
+        {% else %}
+            zu keinem Kurs zusammengestellt, also aus gar keinen Karten.
+        {% endif %}
+    </p>
+
+    <ul>
+    {% for course in preferences.list_course_strings %}
+        <li>{{ course }}</li>
+    {% endfor %}
+    </ul>
+
+    {% if preferences.session.has_x_new_cards > 0 %}
+    <p>
+        Es gibt {% if preferences.session.has_x_new_cards != 1 %} {{ preferences.session.has_x_new_cards }} neue Karten{% else  %} neue Karte{% endif %} zu dieser Kursauswahl.
+        <a href="{% url 'session_refresh' %}">-> In den Stapel mischen!</a
+    </p>
+    {% endif %}
+
+    <div class="text-center">
+        <a href="{% url 'change_preferences' user.pk %}" class="btn btn-sm btn-secondary">Kursauswahl ändern</a>
+    {% if user.preferences.session.deck_size >= 1 %}
+        <a href="{% url 'create_rep' %}" class="btn btn-lg btn-warning">Starten</a>
+    </div>
+    <div class="text-center">
+        {{ user.preferences.session.deck_size }} Karte{% if user.preferences.session.deck_size != 1 %}n{% endif %} auf dem Stapel
+    </div>
+    {% else %}
+    </div>
+    <div class="text-center">
+        Der Stapel ist leer!
+    </div>
+    {% endif %}
+
+    <div class="text-center">
+        <a class="btn btn-sm btn-light" href="{% url 'remove_seen_cards' %}">Aussortieren, falls Rückseite kürzlich gesehen</a>
+    </div>
+
+    {% if preferences.not_known_last_time|length > 0%}
+        <h4>Repe?</h4>
+        <p>Bei {% if preferences.not_known_last_time|length == 1 %} dieser Karte {% else %} diesen {{ preferences.not_known_last_time|length }} Karten {% endif %} warst du letztes Mal unsicher:
+            <br>
+            {% for card_pk, rep in preferences.not_known_last_time.items %}
+                <a type="button" class="btn btn-{% if not rep.i_know %}outline-{% if not rep.back_seen %}warning{% elif rep.i_knew %}success{% else %}danger{% endif %}{% else %}{% if not rep.back_seen %}warning{% elif rep.i_knew %}success{% else %}danger{% endif %}{% endif %} position-relative btn-sm" href='{% url 'rep_repeat' card_pk %}'>K</a>
+            {% endfor %}
+            <br>
+            Klicke darauf, um sie in den Stapel zu mischen!
+        </p>
+    {% endif %}
+
+
+
+{% else %}
+
+    <p>Hier kannst du <a href="{% url 'start_training' %}"><em>deine</em> Kursauswahl</a> sehen.</p>
+
+{% endif %}
+
+{% endblock %}

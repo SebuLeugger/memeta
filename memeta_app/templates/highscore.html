@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %} 
+    Highscore
+{% endblock %}
+
+{% block content %}
+<h1>Highscore</h1>
+
+<table class="table table-striped">
+    <thead>
+        <th scope="row">Gewusst gewusst</th>
+        <th>Reps</th>      
+    </thead>
+    <tbody>
+    {% for user in user_list %}
+        {% if user.rep_set.count > 0 %} 
+        <tr>
+            <td scope="row"><a href="{% url 'profile' user.pk %}">{{ user }}</a></td>
+            <td>
+                {% for rep in user.rep_set.all %} {% if rep.i_knew and rep.i_know %}<a href="{% url 'card_front' rep.card.pk %}" class="btn btn-success btn-sm"></a> {% endif %} {% endfor %}
+            </td>
+        </tr>
+        {% endif %}
+    {% endfor %}
+    </tbody>
+
+
+    <thead>
+        <th scope="row">Erstellt</th>
+        <th>Karten</th>      
+    </thead>
+    <tbody>
+    {% for user in user_list %}
+        {% if user.card_set.count > 0 %} 
+            <tr>
+                <td scope="row"><a href="{% url 'profile' user.pk %}">{{ user }}</a></td>
+                <td>
+                    {% for card in user.card_set.all %} <a href="{% url 'card_front' card.pk %}" class="btn btn-primary btn-sm"></a> {% endfor %}
+                </td>
+            </tr>
+        {% endif %}
+    {% endfor %}
+    </tbody>
+
+</table>
+
+{% endblock content %}

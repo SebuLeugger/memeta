@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %} 
+memeta
+{% endblock %}
+
+{% block content %}
+
+<h1>memeta</h1>
+<p>Willkommen!</p>
+<a class="btn btn-primary" href="{% url 'courses' %}">Kurse</a>
+
+<a class="btn btn-outline-primary" href="{% url 'highscore' %}" >Highscore</a>
+
+
+
+{% endblock %}

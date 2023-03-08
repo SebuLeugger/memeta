@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %} 
+Karteikarten
+{% endblock %}
+
+{% block content %}
+
+<h1>Alle {{ object_list.count }} Karteikarten</h1>
+<br>
+
+
+<div class="row" data-masonry='{"percentPosition": true }'>
+    {% for card in object_list reversed %}
+    <div class="col-sm-8 col-lg-6 mb-4">
+    <div class="card {% if request.user in card.sorted_out_by.all %} text-white bg-secondary {% endif %}">
+        <div class="card-header {% if request.user not in card.sorted_out_by.all %} border-light bg-transparent {% endif %}">
+            {% if last_rep_per_card %}
+                {% for rep in last_rep_per_card|get_item:card.pk %}
+                    {% if rep %}
+                    <a type="button" class="btn btn-{% if not rep.i_know %}outline-{% if not rep.back_seen %}warning{% elif rep.i_knew %}success{% else %}danger{% endif %}{% else %}{% if not rep.back_seen %}warning{% elif rep.i_knew %}success{% else %}danger{% endif %}{% endif %} position-relative btn-sm" href='{% url 'rep' rep.pk %}'></a>
+                    {% else %}
+                    <a type="button" class="btn btn-outline-light position-relative btn-sm" href=""></a>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            <a class="btn btn-sm"  style="float:right" href="{% url 'course' card.course.pk %}">{{ card.course }}</a>
+        </div>
+        <div class="card-body">
+            <div class="card-text">{{ card.front.body|safe }}</div>
+            <p class="card-text text-end"><small class="text-muted">{{ card.creator }}</small></p>
+            
+        </div>
+        <div class="card-footer">
+            <a class="btn {% if request.user in card.sorted_out_by.all %}btn-secondary{% else %}btn-light{% endif %} btn-sm position-relative start-50 translate-middle-x" href="{% url 'card_back' card.pk %}">Rückseite anzeigen</a>
+        </div>
+
+    </div>
+    </div>
+    {% endfor %}
+</div>
+
+
+<br>
+<div>
+    <a href="{% url 'add' %}" class="btn btn-primary btn-lg position-relative start-50 translate-middle-x">Karteikarte erstellen</a>
+</div>
+<br>
+
+
+
+{% endblock %}

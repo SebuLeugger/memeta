@@ -1,0 +1,96 @@
+{% extends 'base_training.html' %}
+
+{% block title %} 
+    Training
+{% endblock %}
+
+{% block content %}
+
+{% if user.is_authenticated %}
+    {% if user == rep.user %}
+
+    <div class="position-absolute top-0 end-0">
+        <a class="btn btn-light btn-sm" href="{% url 'session_overview' user.pk %}">Training beenden?</a>
+    </div>
+
+    <br>
+
+    <div class="row">
+
+        <div class="col-sm-8 col-lg-6 mb-4">
+            <div class="card border-warning h-100">
+                <div class="card-header text-center bg-transparent border-light">
+                    <small class="text-muted">Karte #{{ rep.card.pk }}</small>
+                </div>
+                <div class="card-body">
+                    <div class="card-text">{{ rep.card.front.body|safe }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-8 col-lg-6 mb-4">
+            <div class="card border-info h-100">
+                <div class="card-header text-center bg-transparent border-light">
+                    <small class="text-muted">Kurs: {{ rep.card.course }}</small>
+                </div>
+                <div class="card-body">
+                    {{ rep.card.back.body|safe }}
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+        <p class="text-center">
+            {% if rep.i_know %}
+                {% if not rep.i_knew %}
+                    <a type="button" class="btn btn-danger position-relative btn-sm" href=''>4</a> <em>Ich dachte, ich weiss es, aber täuschte mich</em>
+                {% elif rep.i_knew%}
+                    <a type="button" class="btn btn-success position-relative btn-sm" href=''>1</a> <em>Ich wusste, dass ich's wusste</em>
+                {% else %}
+                    <a type="button" class="btn btn-secondary position-relative btn-sm" href=''></a>
+                {% endif %}
+            {% endif %}
+            {% if not rep.i_know %}
+                {% if not rep.i_knew %}
+                    <a type="button" class="btn btn-outline-danger position-relative btn-sm" href=''>3</a> <em>Ich wusste, dass ich's nicht wusste</em>
+                {% elif rep.i_knew%}
+                    <a type="button" class="btn btn-outline-success position-relative btn-sm" href=''>2</a> <em>Ich wusste nicht, dass ich's wusste</em>
+                {% else %}
+                    <a type="button" class="btn btn-secondary position-relative btn-sm" href=''></a>
+                {% endif %}
+            {% endif %}
+        </p>
+       
+        {% if user.preferences.session.deck_size >= 1 %}
+            <div class="text-center">
+                <a class="btn btn-warning btn-lg" href="{% url 'create_rep' %}">Nächste Karte ziehen</a>
+            </div>
+            <div class="text-center">
+                Noch {{ user.preferences.session.deck_size }} Karte{% if user.preferences.session.deck_size != 1 %}n{% endif %} auf dem Stapel
+            </div>
+        {% else %}
+            <div class="text-center">
+                <a class="btn btn-sm btn-warning" href="{% url 'session_overview' user.pk %}">Training beenden?</a>
+            </div>
+            <div class="text-center">
+                Der Stapel ist leer!
+            </div>
+        {% endif %}
+
+        <br>
+        <div class="text-center">
+            <a class="btn btn-sm btn-outline-secondary btn" href="{% url 'session_overview' user.pk %}">Training beenden?</a>
+        </div>
+
+        <br/>  
+
+    {% else %}
+        <p>Auf diese Seite hast du keinen Zugriff, {{ user }}.  Hier geht's <a href="{% url 'home' %}">zur Homepage</a>.</p>
+    {% endif %}
+{% else %} 
+    <p>Du musst <a href="{% url 'home' %}">registriert sein und dich einloggen</a> um zu trainieren.</p>
+{% endif %}
+
+{% endblock content %}

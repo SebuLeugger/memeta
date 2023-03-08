@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %} 
+Vorderseite {{ cardfront.pk }}
+{% endblock %}
+
+{% block content %}
+{% if user.id == cardfront.creator.id %}
+<!--<a  style="float:right" class="btn btn-outline-secondary btn-sm" href="">Frage editieren</a>-->
+{% endif %}
+
+
+<div class="row" data-masonry='{"percentPosition": true }'>
+
+    <div class="col-sm-8 col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header text-center bg-transparent border-light">
+                <small class="text-muted">Vorderseite #{{cardfront.pk}} - Kurs: <a href="{% url 'course' cardfront.course.pk %}">{{ cardfront.course }}</a></small>
+            </div>
+            <div class="card-body">
+                <div class="card-text">{{ cardfront.body|safe }}</div>
+            </div>
+            <div class="card-footer"> 
+            {% if cardfront.front_for.count == 0 %}
+                <div>
+                    <a class="btn btn-success btn-sm position-relative start-50 translate-middle-x" href="{% url 'add_cardback' cardfront.pk %}">Rückseite hinzufügen</a>
+                </div>
+            {% else %}
+                {% for card in cardfront.front_for.all %}
+                    <div>
+                        <a class="btn btn-light btn-sm position-relative start-50 translate-middle-x" href="{% url 'card_back' card.pk %}">Rückseite anzeigen</a>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    
+    <div class="col-sm-8 col-lg-6 mb-4">
+    <div class="card border-0 bg-transparent">
+        <div class="card-body">
+        {% if user.is_authenticated %}
+            <div class="text-muted">
+                {% if user.id == cardfront.creator.id %}
+                    <small><em>Diese Vorderseite hast du erstellt.</em> </small>
+                {% else %}
+                    <small><em>Vorderseite erstellt von <a href="{% url 'profile' cardfront.creator.pk %}">{{ cardfront.creator }}</a></em></small>
+                {% endif %}
+            </div>
+        {% endif %}
+        </div>
+    </div>
+    </div>
+    
+</div>
+        
+    <hr>
+
+<br>
+<a href="{% url 'add_front' %}" class="btn btn-danger position-relative start-50 translate-middle-x">Weitere Vorderseite erstellen</a>
+<br>
+
+{% endblock content %}
+

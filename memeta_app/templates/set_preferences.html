@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %} 
+Training starten
+{% endblock %}
+
+{% block content %}
+
+<h1>Training starten</h1>
+
+{% if user.is_authenticated %}
+
+    <p>Wähle die Kurse aus, zu denen dir Karten angezeigt werden sollen.</p>
+    <div class="form-group">
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="text-center">
+            <button class="btn btn-lg btn-warning">Starten</button>
+        </div>
+    </form>
+    </div>
+    <br>
+    
+<!--
+        <script>
+        var user_id = "{{ user.id }}";
+        document.getElementById("user_auto").value=user_id;
+    </script>
+-->
+
+{% else %}
+
+    <p>Du musst registriert sein und dich einloggen, um ein Training zu starten.</p>
+
+{% endif %}
+
+{% endblock %}

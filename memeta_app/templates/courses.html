@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %} 
+Kurse
+{% endblock %}
+
+{% block content %}
+
+<h1>Kurse</h1>
+
+<table class="table table-striped">
+    <thead>
+    </thead>
+    <tbody>
+    {% for course in course_list %}
+      <tr>
+        <td scope="row">{{ course }}</td>
+        <td><a href="{% url 'course' course.pk %}">{{ course.card_set.count }} Karten</a></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+{% endblock %}

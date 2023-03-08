@@ -1,0 +1,150 @@
+{% extends 'base_training.html' %}
+
+{% block title %} 
+    Laufendes Training von {{ session.preferences.user }}
+{% endblock %}
+
+{% block content %}
+
+{% if user.is_authenticated %}
+    {% if user == session.preferences.user %}
+        
+        <div class="position-absolute top-0 end-0">
+            <a class="btn btn-light btn-sm" href="{% url 'end_session' %}">Training beenden!</a>
+        </div>
+
+        <h1>Gezogene Karten</h1>
+        
+        {% if session.has_unseen_backs %}
+            <hr>   
+            <h3>{{ session.unseen_backs_count }} Karte{% if session.unseen_backs_count != 1 %}n{% endif %} noch nicht umgedreht</h3>
+            <p>
+                {% for rep in session.reps.all %}
+                    {% if not rep.back_seen %}
+                        {% if rep.i_know %}
+                            <a type="button" class="btn btn-warning position-relative btn-sm" href='{% url 'rep_front' rep.pk %}'><em>?</em></a>
+                        {% else %}
+                            <a type="button" class="btn btn-outline-warning position-relative btn-sm" href='{% url 'rep_front' rep.pk %}'><em>?</em></a>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </p>
+        {% endif %}
+
+        <hr>        
+
+        {% if session.has_seen_backs %}
+            <h3>{{ session.seen_backs_count }} Karte{% if session.seen_backs_count != 1 %}n{% endif %} umgedreht</h3>
+            <div>Ich wusste, dass ich's wusste:</div>
+            <p>
+            {% for rep in session.reps.all %}
+            {% if rep.back_seen %}
+                {% if rep.i_knew and rep.i_know %}
+                <a type="button" class="btn btn-success position-relative btn-sm" href='{% url 'recap' rep.pk %}'>1</a>
+                {% endif %}
+            {% endif %}
+            {% endfor %}
+            </p>
+        
+            <div>Ich wusste nicht, dass ich's wusste:</div>
+            <p>
+            {% for rep in session.reps.all %}
+            {% if rep.back_seen %}
+                {% if rep.i_knew and not rep.i_know %}
+                <a type="button" class="btn btn-outline-success position-relative btn-sm" href='{% url 'recap' rep.pk %}'>2</a>
+                {% endif %}
+            {% endif %}
+            {% endfor %}
+            </p>
+        
+            <div>Ich wusste, dass ich's nicht wusste:</div>
+            <p>
+            {% for rep in session.reps.all %}
+            {% if rep.back_seen %}
+                {% if not rep.i_knew and not rep.i_know %}
+                <a type="button" class="btn btn-outline-danger position-relative btn-sm" href='{% url 'recap' rep.pk %}'>3</a>
+                {% endif %}
+            {% endif %}
+            {% endfor %}
+            </p>
+        
+            <div>Ich dachte, ich weiss es, aber täuschte mich:</div>
+            <p>
+            {% for rep in session.reps.all %}
+            {% if rep.back_seen %}
+                {% if rep.i_know and not rep.i_knew %}
+                    <a type="button" class="btn btn-danger position-relative btn-sm" href='{% url 'recap' rep.pk %}'>4</a>
+                {% endif %}
+            {% endif %}
+            {% endfor %}
+            </p>
+        
+            <hr>
+            
+            <h5>Chronologisch</h5>
+            <p>
+                {% for rep in session.reps.all %}
+                    {% if not rep.back_seen %}
+                        {% if rep.i_know %}
+                            <a type="button" class="btn btn-warning position-relative btn-sm" href='{% url 'rep_front' rep.pk %}'><em>?</em></a>
+                        {% else %}
+                            <a type="button" class="btn btn-outline-warning position-relative btn-sm" href='{% url 'rep_front' rep.pk %}'><em>?</em></a>
+                        {% endif %}
+                    {% else %}
+                        {% if rep.i_know %}
+                            {% if not rep.i_knew %}
+                                <a type="button" class="btn btn-danger position-relative btn-sm" href='{% url 'recap' rep.pk %}'>4</a>
+                            {% else %}
+                                <a type="button" class="btn btn-success position-relative btn-sm" href='{% url 'recap' rep.pk %}'>1</a>
+                            {% endif %}
+                        {% endif %}
+                        {% if not rep.i_know %}
+                            {% if not rep.i_knew %}
+                                <a type="button" class="btn btn-outline-danger position-relative btn-sm" href='{% url 'recap' rep.pk %}'>3</a>
+                            {% else %}
+                                <a type="button" class="btn btn-outline-success position-relative btn-sm" href='{% url 'recap' rep.pk %}'>2</a>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </p>
+        {% endif %}
+
+        {% if user.preferences.session.deck_size >= 1 %}
+            <div class="text-center">
+                <a class="btn btn-warning btn-lg" href="{% url 'create_rep' %}">Nächste Karte ziehen</a>
+            </div>
+            <div class="text-center">
+                Noch {{ user.preferences.session.deck_size }} Karte{% if user.preferences.session.deck_size != 1 %}n{% endif %} auf dem Stapel
+            </div>
+            
+            <br>
+            <div class="text-center">
+                <a class="btn btn-danger btn-sm" href="{% url 'end_session' %}">Training beenden!</a>
+            </div>
+            <div class="text-center">
+                Die {{ user.preferences.session.deck_size }} Karte{% if user.preferences.session.deck_size != 1 %}n{% endif %} auf dem Stapel kannst du auch beim nächsten Training ziehen
+            </div>
+        {% else %}
+            <div class="text-center">
+                Der Stapel ist leer!
+            </div>
+            <br>
+            <div class="text-center">
+                <a class="btn btn-danger btn-sm" href="{% url 'end_session' %}">Training beenden!</a>
+            </div>
+        {% endif %}
+      
+        
+        <br>
+
+
+    {% else %}
+        <p>Auf diese Seite hast du keinen Zugriff, {{ user }}.  Hier geht's <a href={% url 'home' %}>zur Homepage</a>.</p>
+    {% endif %}
+   
+{% else %} 
+    <p>Du musst registriert sein, dich einloggen und eine Trainings-Session absolvieren, um deine eigene Session-Übersicht anzuzeigen.</p>
+{% endif %}
+
+{% endblock content %}

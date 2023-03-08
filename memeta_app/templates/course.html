@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %} 
+{{ course }}
+{% endblock %}
+
+{% block content %}
+
+
+    <h1>{{ course }}</h1>
+
+
+    <h3>{{ solitary_cardfronts.count }} einsame Vorderseite{% if solitary_cardfronts.count != 1 %}n{% endif %}</h3>
+<br>
+{% if solitary_cardfronts %}
+
+    <div class="row row-cols-1 row-cols-md-2 g-4" data-masonry='{"percentPosition": true }'>
+    {% for front in solitary_cardfronts reversed %}
+        <div class="col-sm-8 col-lg-6 mb-4">
+        <div class="card border-danger">
+            <div class="card-body">
+                <div class="card-text">{{ front.body|safe }}</div>                    
+            </div>
+            <div class="card-footer">
+                <a class="btn btn-success btn-sm position-relative start-50 translate-middle-x" href="{% url 'add_cardback' front.pk %}">Rückseite hinzufügen</a>
+            </div>
+        </div>
+        </div>
+    {% endfor %}
+    </div>
+
+{% else %}
+    <p>Zu diesem Kurs gibt es noch keine einsamen Vorderseiten, oder keine mehr.</p>
+{% endif %}
+
+<br>
+<div>
+    <a href="{% url 'add_front' %}" class="btn btn-danger btn-lg position-relative start-50 translate-middle-x">Vorderseite erstellen</a>
+</div>
+<br>
+<hr>
+<br>
+
+<h3>{{ course_cards.count }} vollständige Karteikarte{% if course_cards.count != 1 %}n{% endif %}</h3>
+<br>
+
+{% if course_cards %}
+
+    <div class="row" data-masonry='{"percentPosition": true }'>
+    {% for card in course_cards reversed %}
+        <div class="col-sm-8 col-lg-6 mb-4">
+        <div class="card {% if request.user in card.sorted_out_by.all %} text-white bg-secondary {% endif %}">
+            <div class="card-header {% if request.user not in card.sorted_out_by.all %} border-light bg-transparent {% endif %}">
+                {% if last_rep_per_card %}
+                    {% for rep in last_rep_per_card|get_item:card.pk %}
+                        {% if rep %}
+                        <a type="button" class="btn btn-{% if not rep.i_know %}outline-{% if not rep.back_seen %}warning{% elif rep.i_knew %}success{% else %}danger{% endif %}{% else %}{% if not rep.back_seen %}warning{% elif rep.i_knew %}success{% else %}danger{% endif %}{% endif %} position-relative btn-sm" href='{% url 'rep' rep.pk %}'></a>
+                        {% else %}
+                        <a type="button" class="btn btn-outline-light position-relative btn-sm" href=""></a>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="card-text">{{ card.front.body|safe }}</div>                    
+            </div>
+            <div class="card-footer">
+                <a class="btn {% if request.user in card.sorted_out_by.all %}btn-secondary{% else %}btn-light{% endif %} btn-sm position-relative start-50 translate-middle-x" href="{% url 'card_back' card.pk %}">Rückseite anzeigen</a>
+            </div>
+        </div>
+        </div>
+    {% endfor %}
+    </div>
+
+{% else %}
+    <p>Zu diesem Kurs wurden noch keine Karteikarten erstellt.</p>
+{% endif %}
+<br>
+<div>
+<a href="{% url 'add' %}" class="btn btn-primary btn-lg position-relative start-50 translate-middle-x">Karteikarte erstellen</a>
+</div>
+<br>
+
+
+{% endblock content %}
+

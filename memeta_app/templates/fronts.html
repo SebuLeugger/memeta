@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %} 
+Fragen
+{% endblock %}
+
+{% block content %}
+
+<h1>Einsame Vorderseiten</h1>
+<br>
+
+
+
+
+<div class="row" data-masonry='{"percentPosition": true }'>
+{% for front in object_list reversed %}
+    {% if front.front_for.count == 0 %}
+        <div class="col-sm-8 col-lg-6 mb-4">
+            <div class="card border-danger">
+                <div class="card-header text-center bg-transparent border-light">
+                    <small class="text-muted">Vorderseite #{{front.pk}} - Kurs: <a href="{% url 'course' front.course.pk %}">{{ front.course }}</a></small>
+                </div>
+                <div class="card-body">
+                    <div class="card-text">{{ front.body|safe }}</div>
+                </div>
+                <div class="card-footer"> 
+                    <a class="btn btn-success btn-sm position-relative start-50 translate-middle-x" href="{% url 'add_cardback' front.pk %}">Rückseite hinzufügen</a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endfor %} 
+</div>
+
+
+
+
+
+
+
+
+    
+
+
+<br>
+<br>
+<a href="{% url 'add_front' %}" class="btn btn-danger btn-lg position-relative start-50 translate-middle-x">Vorderseite erstellen</a>
+<br>
+
+
+
+{% endblock %}

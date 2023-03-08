@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %} 
+Profil {{ user }}
+{% endblock %}
+
+{% block content %}
+<h1><em>{{ user }}:</em></h1>
+
+<div>
+    Es gibt {{ user.card_set.count }} Karte{% if user.card_set.count != 1 %}n{% endif %} mit {% if user.card_set.count == 1 %}einer{% endif %} Rückseite{% if user.card_set.count != 1 %}n{% endif %} von mir:
+</div>
+<p>
+    {% for card in user.card_set.all %}
+        <a type="button" class="btn btn-primary position-relative btn-sm" href='{% url 'card_front' card.pk %}'>K
+            {% if card.appreciated_by.count > 0  %}
+                <span class="position-absolute top-100 start-100 translate-middle badge rounded-pill bg-info">{{ card.appreciated_by.count}}</span>
+            {% endif %}
+        </a>
+    {% endfor %}
+</p>
+
+<div>
+    Einsame Vorderseiten von mir:
+</div>
+<p>
+    {% for front in user.cardfront_set.all %}
+        {% if front.is_lonely %}
+            <a type="button" class="btn btn-outline-primary position-relative btn-sm" href='{% url 'front' front.pk %}'>V</a>
+        {% endif %}
+    {% endfor %}
+</p>
+
+<div>
+    Vorderseiten von mir mit Rückseiten von anderen:
+</div>
+<p>
+    {% for front in user.cardfront_set.all %}
+        {% if front.was_completed_in_colab %}
+            <a type="button" class="btn btn-outline-primary position-relative btn-sm" href='{% url 'card_front' front.first_colab_card.pk %}'>K</a>
+        {% endif %}
+    {% endfor %}
+</p>
+
+<div>
+    Ich habe bei {{ user.appreciated_cards.count }} Karte{% if user.appreciated_cards.count != 1 %}n{% endif %} ein "Merci" hinterlassen:
+</div>
+<p>
+    {% for card in user.appreciated_cards.all %}
+        <a type="button" class="btn btn-secondary position-relative btn-sm" href='{% url 'card_front' card.pk %}'>K
+            {% if card.appreciated_by.count > 0  %}
+                <span class="position-absolute top-100 start-100 translate-middle badge rounded-pill bg-info">{{ card.appreciated_by.count}}</span>
+            {% endif %}
+        </a>
+    {% endfor %}
+</p>
+
+<div>
+    Ich habe {{ user.sorted_out_cards.count }} Karte{% if user.sorted_out_cards.count != 1 %}n{% endif %} aussortiert:
+</div>
+<p>
+    {% for card in user.sorted_out_cards.all %}
+        <a type="button" class="btn btn-dark position-relative btn-sm" href='{% url 'card_front' card.pk %}'>K
+            {% if card.appreciated_by.count > 0  %}
+                <span class="position-absolute top-100 start-100 translate-middle badge rounded-pill bg-info">{{ card.appreciated_by.count}}</span>
+            {% endif %}
+        </a>
+    {% endfor %}
+</p>
+
+<hr>
+
+<h4>{{ user.sessionlog_set.count }} Trainings-Sessions</h4>
+<h5>Total {{ user.rep_set.count }} Reps</h5>
+
+<div>Ich wusste, dass ich's wusste:</div>
+<p>
+{% for rep in user.rep_set.all %}
+    {% if rep.back_seen and rep.i_knew and rep.i_know %}
+    <a type="button" class="btn btn-success position-relative btn-sm" href='{% url 'card_front' rep.card.pk %}'>1</a>
+    {% endif %}
+{% endfor %}
+</p>
+
+<div>Ich wusste nicht, dass ich's wusste:</div>
+<p>
+{% for rep in user.rep_set.all %}
+    {% if rep.back_seen and rep.i_knew and not rep.i_know %}
+    <a type="button" class="btn btn-outline-success position-relative btn-sm" href='{% url 'card_front' rep.card.pk %}'>2</a>
+    {% endif %}
+{% endfor %}
+</p>
+
+<div>Ich wusste, dass ich's nicht wusste:</div>
+<p>
+{% for rep in user.rep_set.all %}
+    {% if rep.back_seen and not rep.i_knew and not rep.i_know %}
+    <a type="button" class="btn btn-outline-danger position-relative btn-sm" href='{% url 'card_front' rep.card.pk %}'>3</a>
+    {% endif %}
+{% endfor %}
+</p>
+
+<div>Ich meinte es zu wissen, aber täuschte mich:</div>
+<p>
+{% for rep in user.rep_set.all %}
+    {% if rep.back_seen and rep.i_know and not rep.i_knew %}
+    <a type="button" class="btn btn-danger position-relative btn-sm" href='{% url 'card_front' rep.card.pk %}'>4</a>
+    {% endif %}
+{% endfor %}
+</p>
+
+<div>Ich dachte, ich wisse es, und schaute die Rückseite nicht an:</div>
+<p>
+{% for rep in user.rep_set.all %}
+    {% if not rep.back_seen and rep.i_know %}
+    <a type="button" class="btn btn-warning position-relative btn-sm" href='{% url 'card_front' rep.card.pk %}'>?</a>
+    {% endif %}
+{% endfor %}
+</p>
+
+<div>Ich dachte, ich wisse es nicht, und schaute die Rückseite nicht an:</div>
+<p>
+{% for rep in user.rep_set.all %}
+    {% if not rep.back_seen and not rep.i_know %}
+    <a type="button" class="btn btn-outline-warning position-relative btn-sm" href='{% url 'card_front' rep.card.pk %}'>?</a>
+    {% endif %}
+{% endfor %}
+</p>
+
+<hr>
+<h5>Chronologisch</h5>
+<p>
+    {% for rep in user.rep_set.all %}
+        {% if not rep.back_seen %}
+            {% if rep.i_know %}
+                <a type="button" class="btn btn-warning position-relative btn-sm" href='{% url 'card_front' rep.card.pk %}'><em>?</em></a>
+            {% else %}
+                <a type="button" class="btn btn-outline-warning position-relative btn-sm" href='{% url 'card_front' rep.card.pk %}'><em>?</em></a>
+            {% endif %}
+        {% else %}
+            {% if rep.i_know %}
+                {% if not rep.i_knew %}
+                    <a type="button" class="btn btn-danger position-relative btn-sm" href='{% url 'card_front' rep.card.pk %}'>4</a>
+                {% else %}
+                    <a type="button" class="btn btn-success position-relative btn-sm" href='{% url 'card_front' rep.card.pk %}'>1</a>
+                {% endif %}
+            {% endif %}
+            {% if not rep.i_know %}
+                {% if not rep.i_knew %}
+                    <a type="button" class="btn btn-outline-danger position-relative btn-sm" href='{% url 'card_front' rep.card.pk %}'>3</a>
+                {% else %}
+                    <a type="button" class="btn btn-outline-success position-relative btn-sm" href='{% url 'card_front' rep.card.pk %}'>2</a>
+                {% endif %}
+            {% endif %}    
+        {% endif %}
+    {% endfor %}
+</p>
+<br>
+
+{% if user == request.user %}
+    <hr>
+    <h5>Email für die Passwortwiederherstellung</h5>
+    <p>{{ user.email }}</p>
+    <p><em>Deine Email-Adresse ist nur für dich und die Seiten-Admins einsehbar. Der Rest des Profils inkl. der Fantasiename "{{ user }}" ist öffentlich.</em></p>
+    <!--<div><a href="" class="btn btn-outline-primary position-relative start-50 translate-middle-x">Email/Fantasiename ändern</a></div>-->
+    <br>
+{% endif %}
+
+{% endblock %}

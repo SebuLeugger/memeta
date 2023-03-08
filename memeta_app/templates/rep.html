@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %} 
+    Rep Recap
+{% endblock %}
+
+{% block content %}
+<h1>Rep Recap</h1>
+<p><a href="{% url 'profile' rep.user.pk %}">{{ rep.user }}</a>, {{ rep.start_time }} bis {{ rep.end_time }}</p>
+
+<p>
+    {% if not rep.back_seen %}
+        {% if rep.i_know %}
+            <a type="button" class="btn btn-warning position-relative btn-sm" href='{% url 'card_front' rep.card.pk %}'>?</a> <em>Ich dachte, ich wisse es, und schaute die Rückseite nicht an</em>
+        {% else %}
+            <a type="button" class="btn btn-outline-warning position-relative btn-sm" href='{% url 'card_front' rep.card.pk %}'>?</a> <em>Ich dachte, ich wisse es nicht, und schaute die Rückseite nicht an</em>
+        {% endif %}
+    {% else %}
+        {% if rep.i_know %}
+            {% if not rep.i_knew %}
+                <a type="button" class="btn btn-danger position-relative btn-sm" href='{% url 'card_front' rep.card.pk %}'>4</a> <em>Ich dachte, ich wisse es, aber täuschte mich</em>
+            {% else %}
+                <a type="button" class="btn btn-success position-relative btn-sm" href='{% url 'card_front' rep.card.pk %}'>1</a> <em>Ich wusste, dass ich's wusste</em>
+            {% endif %}
+        {% endif %}
+        {% if not rep.i_know %}
+            {% if not rep.i_knew %}
+                <a type="button" class="btn btn-outline-danger position-relative btn-sm" href='{% url 'card_front' rep.card.pk %}'>3</a> <em>Ich wusste, dass ich's nicht wusste</em>
+            {% else %}
+                <a type="button" class="btn btn-outline-success position-relative btn-sm" href='{% url 'card_front' rep.card.pk %}'>2</a> <em>Ich wusste nicht, dass ich's wusste</em>
+           {% endif %}
+        {% endif %}
+    {% endif %}    
+</p>
+
+<p><a href="{% url 'card_front' rep.card.pk %}">Karte {{ rep.card.pk }}</a> - Kurs <a href="{% url 'course' rep.card.course.pk %}">{{ rep.card.course }}</a></p>
+
+{% endblock content %}

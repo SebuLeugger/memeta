@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %} 
+Vorderseite erstellen
+{% endblock %}
+
+{% block content %}
+
+<h1>Vorderseite erstellen</h1>
+{% if user.is_authenticated %}
+<p>Wähle den passenden Kurs und schreibe dann eine Frage, eine Problemstellung oder ein Stichwort auf die Vorderseite. Du kannst auch gerne Bilder aus dem Netz einbinden, wenn sie unter freien Lizenzen veröffentlicht wurden (Wikipedia ist eine gute Quelle für solche Bilder). Klicke danach auf "Veröffentlichen", damit andere (oder du zu einem späteren Zeitpunkt) eine passende Rückseite erstellen können.</p>
+<br/>
+<div class="form-group">
+<form method="POST">
+    {% csrf_token %}
+    {{ form.media }}
+    {{ form.as_p }}
+<button class="btn btn-primary">Veröffentlichen</button>
+</form>
+</div>
+
+<br/>
+
+{% else %}
+
+<p>Du musst registriert sein und dich einloggen, um Karten zu erstellen.</p>
+
+{% endif %}
+
+{% endblock %}

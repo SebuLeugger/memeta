@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %} 
+Neuer Stapel
+{% endblock %}
+
+{% block content %}
+
+{% if user == preferences.user %}
+    <h1>Neuer Stapel</h1>
+    <p>Wähle die Kurse aus, zu denen dir Karten auf den Stapel gelegt werden sollen:</p>
+    <div class="form-group">
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="text-center">
+            <button class="btn btn-warning">Stapel erstellen</button>
+        </div>
+    </form>
+    </div>
+
+    <br/>
+{% else %}
+
+    <p>Hier kannst du <a href="{% url 'start_training' %}"><em>deine</em> Kursauswahl</a> festlegen.</p>
+
+{% endif %}
+
+{% endblock %}

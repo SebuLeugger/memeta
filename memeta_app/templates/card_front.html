@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %} 
+Karte {{ card.pk }} Vorderseite
+{% endblock %}
+
+{% block content %}
+
+<div class="row" data-masonry='{"percentPosition": true }'>
+
+<div class="col-sm-8 col-lg-6 mb-4">
+    <div class="card">
+        <div class="card-header text-center bg-transparent border-light">
+            <small class="text-muted">#{{card.pk}}</small>
+        </div>
+        <div class="card-body">
+            <div class="card-text">{{ card.front.body|safe }}</div>
+        </div>
+        <div class="card-footer">
+            <a href='{% url 'card_back' card.pk %}' class="btn btn-light btn-sm position-relative start-50 translate-middle-x">Rückseite anzeigen</a>
+        </div>
+    </div>
+</div>
+
+
+<div class="col-sm-8 col-lg-6 mb-4">
+<div class="card border-0 bg-transparent">
+    <div class="card-body p-0">
+    {% if user.is_authenticated %}
+        <div class="text-muted">
+            {% if user.id == card.front.creator.id %}
+                <small><em>Diese {% if card.front.creator != card.creator %}Vorderseite{% else %}Karte{% endif %} hast du erstellt.</em> </small>
+            {% else %}
+                <small><em>{% if card.front.creator != card.creator %}Vorderseite{% else %}Karte{% endif %} erstellt von <a href="{% url 'profile' card.front.creator.pk %}">{{ card.front.creator }}</a></em></small>
+            {% endif %}
+        </div>
+    {% endif %}
+    </div>
+    </div>
+</div>
+
+</div>
+    
+<hr>
+<br>
+<div class="btn-group position-relative start-50 translate-middle-x" role="group">
+    <a href="{% url 'cards' %}" class="btn btn-outline-secondary">Alle Karten</a>
+    <a href="{% url 'course' card.course.pk %}" class="btn btn-outline-secondary">Alle Karten zum Kurs</a>
+</div>
+<br>
+<br>
+<div>
+    <a href="{% url 'add' %}" class="btn btn-primary position-relative start-50 translate-middle-x">Weitere Karte erstellen</a>
+</div>
+<br>
+
+{% endblock content %}

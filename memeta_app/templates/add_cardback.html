@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %} 
+Rückseite erstellen
+{% endblock %}
+
+{% block content %}
+
+<h1>Karteikarte erstellen</h1>
+{% if user.is_authenticated %}
+<p>Schreibe auf die Rückseite eine passende Antwort/Lösung/Erläuterung zu dieser Vorderseite:</p>
+
+<div class="row" data-masonry='{"percentPosition": true }'>
+
+    <div class="col-sm-8 col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header text-center bg-transparent border-light">
+                <small class="text-muted">Kurs: <a href="{% url 'course' front.course.pk %}">{{ front.course }}</a></small>
+            </div>
+            <div class="card-body">
+                <div class="card-text">{{ front.body|safe }}</div>
+            </div>
+            <div class="card-footer bg-transparent border-light">
+            </div>
+        </div>
+    </div>
+    
+    
+    <div class="col-sm-8 col-lg-6 mb-4">
+    <div class="card border-0 bg-transparent">
+        <div class="card-body">
+        {% if user.is_authenticated %}
+            <div class="text-muted">
+                {% if user.id == front.creator.id %}
+                    <small><em>Diese Vorderseite hast du erstellt.</em> </small>
+                {% else %}
+                    <small><em>Vorderseite erstellt von <a href="{% url 'profile' front.creator.pk %}">{{ front.creator }}</a></em></small>
+                {% endif %}
+            </div>
+        {% endif %}
+        </div>
+    </div>
+    </div>
+    
+</div>
+
+<br/>
+<div class="form-group">
+<form method="POST">
+    {% csrf_token %}
+    {{ form.media }}
+    {{ form.as_p }}
+<button class="btn btn-primary">Veröffentlichen</button>
+</form>
+</div>
+<br/>
+
+
+{% else %}
+
+<p>Du musst registriert sein und dich einloggen, um Karten zu erstellen.</p>
+
+{% endif %}
+
+{% endblock %}

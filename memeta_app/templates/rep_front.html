@@ -1,0 +1,77 @@
+{% extends 'base_training.html' %}
+
+{% block title %} 
+Training
+{% endblock %}
+
+{% block content %}
+
+{% if user.is_authenticated %}
+    {% if user == rep.user %}
+    <br>
+    <div class="form-group">
+    <form method="POST">
+    {% csrf_token %}
+
+    <div class="row">
+
+        <div class="col-sm-8 col-lg-6 mb-4">
+            <div class="card border-warning h-100">
+                <div class="card-header text-center bg-transparent border-light">
+                    <small class="text-muted"></small>
+                </div>
+                <div class="card-body">
+                    <div class="card-text">{{ rep.card.front.body|safe }}</div>
+                </div>
+                <div class="card-footer text-center">
+                    {{ form.as_p }}
+                    <div class="mb-3">
+                        <input type="submit" name="cardback" value="Umdrehen" class="btn btn-lg btn-info">
+                    </div>
+                    {% if user.preferences.session.deck_size >= 1 %}
+                        <div>
+                            <input type="submit" name="nextcard" value="Zur Seite legen & nächste Karte ziehen" class="btn btn-warning">
+                        </div>
+                        <div>Noch {{ user.preferences.session.deck_size }} Karte{% if user.preferences.session.deck_size != 1 %}n{% endif %} auf dem Stapel</div>
+                    {% else %}
+                        <div>
+                            <input type="submit" name="overview" value="Training beenden?" class="btn btn-sm btn-warning">
+                        </div>
+                        <div>Der Stapel ist leer!</div>
+                    {% endif %}
+                    <div class="mt-3">
+                        <input type="submit" name="overview" value="Training beenden?" class="btn btn-sm btn-outline-secondary">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-8 col-lg-6 mb-4">
+            <div class="card border-info h-100">
+                <div class="card-header text-center bg-transparent border-light">
+                    <small class="text-muted"></small>
+                </div>
+                <div class="card-body">
+                </div>
+            </div>
+        </div>
+
+
+    </div>     
+        
+   <input type="submit" name="overview" value="Training beenden?" class="btn btn-sm btn-light position-absolute top-0 end-0">
+
+    </form>
+    </div>
+    
+       
+        
+    {% else %}
+        <p>Auf diese Seite hast du keinen Zugriff, {{ user }}. Hier geht's <a href={% url 'home' %}>zur Homepage</a>.</p>
+    {% endif %}
+{% else %} 
+    <p>Du musst <a href={% url 'home' %}>registriert sein und dich einloggen</a> um zu trainieren.</p>
+{% endif %}
+
+{% endblock content %}

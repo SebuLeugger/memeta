@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %} 
+Karteikarte erstellen
+{% endblock %}
+
+{% block content %}
+
+<h1>Karteikarte erstellen</h1>
+<p>Du kannst eine vollständige Karteikarte samt Vorder- und Rückseite erstellen:</p>
+<p><a class="btn btn-primary position-relative start-50 translate-middle-x" href="{% url 'add_cardfront' %}" >Karteikarte erstellen</a></p>
+
+<p>Du kannst auch nur eine Frage, ein Problem oder ein Stichwort auf eine Vorderseite schreiben:</p>
+<p><a class="btn btn-danger position-relative start-50 translate-middle-x" href="{% url 'add_front' %}" >Vorderseite erstellen</a></p>
+
+<p>Und natürlich kannst du Fragen beantworten, Probleme lösen und Stichwörter erläutern:</p>
+<p><a class="btn btn-success position-relative start-50 translate-middle-x" href="{% url 'fronts' %}" >Rückseite erstellen</a></p>
+
+
+{% endblock %}
