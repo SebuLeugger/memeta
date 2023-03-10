@@ -112,20 +112,20 @@ class Preferences(models.Model):
     courses = models.ManyToManyField(Course, related_name='studied_by')
 
     def not_known_last_time(self): 
-        not_known = {} # a dict of card-pks as keys and last reps as values
-        preferred = set() # also a set of card-pks
+        not_known = {}
+        preferred = set()
         last_reps = self.last_rep_per_card()
         for course in self.courses.all():
             for card in course.card_set.all():
-                if card not in self.user.sorted_out_cards.all():#ja, die aussortierten müssen raus!
+                if card not in self.user.sorted_out_cards.all():
                     preferred.add(card.pk)
         for card_pk in preferred:
             if card_pk in last_reps:
                 if not (last_reps[card_pk].i_know and last_reps[card_pk].i_knew):
                     not_known[card_pk] = last_reps[card_pk]
         try:        
-            for card_pk in self.session.card_pk_list(): # ich will nur karten, die nicht eh schon auf dem stapel liegen
-                not_known.pop(card_pk, None) # das none bedeutet, dass es keinen fehler gibt, wenn der key nicht existiert
+            for card_pk in self.session.card_pk_list():
+                not_known.pop(card_pk, None)
         except Session.DoesNotExist:
             pass
         return not_known
@@ -163,9 +163,7 @@ class Rep(models.Model):
 
     def __str__(self):
         return str(self.user) + ' - ' +str(self.start_time.date()) + ' - "' +  self.card.front.body[3:19] + '..."'
-            
-    #def get_absolute_url(self):
-    #    return reverse('rep_front', args=([str(self.id)]) )
+        
 
 class Session(models.Model):
     preferences = models.OneToOneField(Preferences, on_delete=models.CASCADE, primary_key=True)
@@ -204,7 +202,6 @@ class Session(models.Model):
             self.card_pk_list_string = new_card_pk_list_string[1:]
             self.save()
 
-
     def card_pk_list(self):
         if self.card_pk_list_string == '':
             return []
@@ -224,7 +221,7 @@ class Session(models.Model):
     def has_x_new_cards(self):
         count = 0
         for course in self.preferences.courses.all():
-            for card in course.card_set.all(): #ist wohl bith teuer. könnte man auch  mit pk's machen, da die ja auto-incrementen; man könnte sich einfach irgendwie die max pk speichern, wenn man die session erstellt... aber ob das dann günstiger wird?
+            for card in course.card_set.all():
                 if card.created > self.created:
                     count += 1
         return count

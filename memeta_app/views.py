@@ -120,15 +120,18 @@ class CardBackView(DetailView):
         context['total_appreciators'] = total_appreciators
 
         if self.request.user.is_authenticated:
-            my_reps = card_from_db.my_reps(self.request.user)
-            context['my_reps'] = my_reps
+            try:
+                my_reps = card_from_db.my_reps(self.request.user)
+                context['my_reps'] = my_reps
 
-            session_pk_strings = self.request.user.preferences.session.card_pk_list_string.split(',')
-            in_deck = 0
-            for string in session_pk_strings:
-                if str(self.object.pk) == string:
-                    in_deck += 1
-            context['in_deck'] = in_deck
+                session_pk_strings = self.request.user.preferences.session.card_pk_list_string.split(',')
+                in_deck = 0
+                for string in session_pk_strings:
+                    if str(self.object.pk) == string:
+                        in_deck += 1
+                context['in_deck'] = in_deck
+            except Preferences.DoesNotExist:
+                pass
 
         return context
 
@@ -191,12 +194,15 @@ class FrontsView(ListView):
     template_name = 'fronts.html'
 
 
-def start_training_view(request): #wieder entkommentieren für wenn ich fertig bin mit debugging
-    #try:
-    preferences = get_object_or_404(Preferences, pk=request.user)
-    return render(request, 'preferences.html', {'preferences': preferences})
-    #except:
-    #    return redirect('set_preferences')
+def start_training_view(request):
+    if request.user.is_authenticated:
+        try:
+            preferences = Preferences.objects.get(pk=request.user)
+            return render(request, 'preferences.html', {'preferences': preferences})
+        except Preferences.DoesNotExist:
+            return redirect('set_preferences')
+    else:
+        return redirect('set_preferences')
 
 class SetPreferencesView(CreateView):
     model = Preferences
@@ -271,7 +277,7 @@ class RepFrontView(UpdateView):
 
     def get_success_url(self):
         if 'cardback' in self.request.POST:
-            return 'back' # so eine syntax gibts auch, wofür die wohl steht?: return '{}#education'.format(reverse('profile', kwargs={'pk': pk}))
+            return 'back'
         elif 'overview' in self.request.POST:
             return '/session-overview/' + str(self.request.user.pk)
         else: # i.e. if 'nextcard' in request.POST
@@ -288,7 +294,7 @@ class RepBackView(UpdateView):
 
     def get_success_url(self):
         if 'recap' in self.request.POST:
-            return 'recap' # so eine syntax gibts auch, wofür die wohl steht?: return '{}#education'.format(reverse('profile', kwargs={'pk': pk}))
+            return 'recap'
         elif 'overview' in self.request.POST:
             return '/session-overview/' + str(self.request.user.pk)
         else: # i.e. if 'nextcard' in request.POST
@@ -319,7 +325,7 @@ def end_session_view(request):
         session_log = SessionLog(
             user = request.user,
             card_pk_list_string = card_pk_list_string,
-            start =  request.user.preferences.session.reps.all()[0].start_time, #=request.user.preferences.session.created, #hier sollte ich wohl ein anderes feld im session-modell machen, damit dieses created nicht überschrieben werden muss; und zwar: ein feld, das die zeit angibt, wann ein training gestartet wurde
+            start =  request.user.preferences.session.reps.all()[0].start_time,
             )
         session_log.save()
         session_log.courses.set(request.user.preferences.courses.all())
@@ -337,7 +343,7 @@ def end_session_view(request):
         session.reps.clear()
         return redirect('/session-log/' + str(session_log.pk))
 
-def session_refresh_view(request): #testen, dass das nicht eine fremde person auslösen kann!
+def session_refresh_view(request):
     if request.user.is_authenticated:
         pk_list = request.user.preferences.session.pks_of_new_cards_list()
         string = ''

@@ -15,7 +15,7 @@ Rückseite erstellen
     <div class="col-sm-8 col-lg-6 mb-4">
         <div class="card">
             <div class="card-header text-center bg-transparent border-light">
-                <small class="text-muted">Kurs: <a href="{% url 'course' front.course.pk %}">{{ front.course }}</a></small>
+                <small class="text-muted">Kurs: {{ front.course }}</small>
             </div>
             <div class="card-body">
                 <div class="card-text">{{ front.body|safe }}</div>

@@ -45,13 +45,12 @@ class AddFrontForm(forms.ModelForm):
 class SetPreferencesForm(forms.ModelForm):
     class Meta:
         model = Preferences
-        fields = ('courses',)# 'user')
+        fields = ('courses',)
         labels = {
             'courses': '',
         }
         widgets = {
-            'courses': forms.CheckboxSelectMultiple(),#attrs={'class': 'form-check'}), #irgendwie müsste es in ein form-check div rein und im label müsste dann die class form-check-label sein  #bootstrap macht das komisch mit diesen checkboxes..., es setzt sie auf eine zeile über der options-beschreibung
-#            'user': forms.TextInput(attrs={'value': '', 'id': 'user_auto', 'type': 'hidden'}),
+            'courses': forms.CheckboxSelectMultiple(),
         }
 
 class ChangePreferencesForm(forms.ModelForm):
@@ -62,7 +61,7 @@ class ChangePreferencesForm(forms.ModelForm):
             'courses': '',
         }
         widgets = {
-            'courses': forms.CheckboxSelectMultiple(),#attrs={'class': 'form-check-label'}),
+            'courses': forms.CheckboxSelectMultiple(),
         }
 
 class RepFrontForm(forms.ModelForm):
