@@ -102,39 +102,45 @@ Karte {{card.pk}} Rückseite
     
         {% if user.preferences %}
             {% if user not in card.sorted_out_by.all %}
-
-            {% if in_deck > 0 %}
-                <div class="text-muted"><small><em>Liegt auf deinem Trainings-Stapel</em></small></div>
-            {% else %}
-                <div class="text-muted"><small><em>Liegt im Moment nicht auf deinem Trainings-Stapel</em></small></div>
-            {% endif %}
-            <div class="btn-group">
-                {% if in_deck > 0 %}
-                <form action="{% url 'remove_card_from_deck' card.pk %}" method="POST">
-                    {% csrf_token %}
-                    <button type="submit", name="card_id", value="{{ card.id }}", class="btn btn-light btn-sm">Entfernen</button>
-                </form>
+                {% if latest_prognosis %}
+                    <div class="text-muted">
+                        <small>Wird dir ab {{ latest_prognosis }} fürs Training vorgeschlagen</small><br>
+                    </div>
                 {% else %}
-                <form action="{% url 'card_into_deck' card.pk %}" method="POST">
-                    {% csrf_token %}
-                    <button type="submit", name="card_id", value="{{ card.id }}", class="btn btn-light btn-sm">In den Stapel mischen</button>
-                </form>
-                <form action="{% url 'sort_out_card' card.pk %}" method="POST">
-                    {% csrf_token %}
-                    <button type="submit", name="card_id", value="{{ card.id }}", class="mx-1 btn btn-light btn-sm">Weglegen</button>
-                </form>
+                    {% if in_deck > 0 %}
+                        <div class="text-muted"><small><em>Liegt auf deinem Trainings-Stapel</em></small></div>
+                    {% else %}
+                        <div class="text-muted"><small><em>Liegt im Moment nicht auf deinem Trainings-Stapel</em></small></div>
+                    {% endif %}
+                    <div class="btn-group">
+                        {% if in_deck > 0 %}
+                        <form action="{% url 'remove_card_from_deck' card.pk %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit", name="card_id", value="{{ card.id }}", class="btn btn-light btn-sm">Entfernen</button>
+                        </form>
+                        {% else %}
+                        <a type="button" class="btn btn-warning btn-sm" href='{% url 'prognosis' card.pk %}'>Später reinmischen</a>
+                        <form action="{% url 'card_into_deck' card.pk %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit", name="card_id", value="{{ card.id }}", class="btn btn-light btn-sm">Jetzt reinmischen</button>
+                        </form>
+                        <form action="{% url 'sort_out_card' card.pk %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit", name="card_id", value="{{ card.id }}", class="mx-1 btn btn-light btn-sm">Weglegen</button>
+                        </form>
+                        {% endif %}
+                    </div>
                 {% endif %}
-            </div>
             {% else %}
-            <div class="text-muted"><small><em>Kommt nie mehr auf deinen Trainings-Stapel</em></small></div>
-            <div>
-                <form action="{% url 'sort_in_card' card.pk %}" method="POST">
-                    {% csrf_token %}
-                    <button type="submit", name="card_id", value="{{ card.id }}", class="btn btn-dark btn-sm">Karte wieder hervorholen</button>
-                </form>
-            </div>
+                <div class="text-muted"><small><em>Kommt nie mehr auf deinen Trainings-Stapel</em></small></div>
+                <div>
+                    <form action="{% url 'sort_in_card' card.pk %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit", name="card_id", value="{{ card.id }}", class="btn btn-dark btn-sm">Karte wieder hervorholen</button>
+                    </form>
+                </div>
             {% endif %}
-        {% endif %}
+        {% endif %}       
     </div>
     </div>
 </div>

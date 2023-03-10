@@ -1,5 +1,6 @@
 from django import forms
-from .models import CardFront, CardBack, Card, Preferences, Rep
+from .models import CardFront, CardBack, Card, Preferences, Rep, IllKnow
+from bootstrap_datepicker_plus.widgets import DatePickerInput
 
 
 
@@ -104,4 +105,16 @@ class RepBackForm(forms.ModelForm):
                 (True, 'Ich wusste, was hier steht'), 
                 (False, 'Ich wusste nicht, was hier steht')
             ]),
+        }
+
+
+class AddIllKnowForm(forms.ModelForm):
+    class Meta:
+        model = IllKnow
+        fields = ('when',)
+        labels = {
+            'when': 'Wann weisst du das gerade noch knapp?',
+        }
+        widgets = {
+            'when': DatePickerInput(options={"format": "DD.MM.YYYY"}),
         }

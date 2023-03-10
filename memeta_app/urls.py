@@ -2,6 +2,7 @@ from django.urls import path
 #from . import views
 from .views import AddCardFrontView, add_card_view, AddCardBackView, CardsView, CardFrontView, CardBackView, sort_out_card_view, sort_in_card_view, appreciate_card_view, unappreciate_card_view, card_into_deck_view, remove_card_from_deck_view
 from .views import CoursesView, course_view, start_training_view, SetPreferencesView, PreferencesView, ChangePreferencesView, create_session_view, create_rep_view, RepFrontView, RepBackView,  SessionOverviewView, end_session_view, RepRecapView, rep_repeat_view, remove_seen_cards_view
+from .views import AddIllKnowView, prognosis_session_view
 from .views import home_view, HighscoreView, UserProfileView, SessionLogView, RepView, session_refresh_view
 from .views import add_view, AddFrontView, FrontView, FrontsView
 
@@ -48,6 +49,9 @@ urlpatterns = [
     path('rep/<int:pk>/back', RepBackView.as_view(success_url='recap'), name='rep_back'),
     path('rep/<int:pk>/recap', RepRecapView.as_view(), name='recap'),
     path('rep/<int:pk>/', RepView.as_view(), name='rep'),
+    
+    path('card/<int:card_pk>/prognosis', AddIllKnowView.as_view(), name='prognosis'),
+    path('prognosis-session', prognosis_session_view, name='prognosis_session'),
 
     path('profile/<int:pk>', UserProfileView.as_view(), name='profile'),
     path('highscore/', HighscoreView.as_view(), name='highscore'),

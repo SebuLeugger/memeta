@@ -29,8 +29,17 @@
     {% if preferences.session.has_x_new_cards > 0 %}
     <p>
         Es gibt {% if preferences.session.has_x_new_cards != 1 %} {{ preferences.session.has_x_new_cards }} neue Karten{% else  %} neue Karte{% endif %} zu dieser Kursauswahl.
-        <a href="{% url 'session_refresh' %}">-> In den Stapel mischen!</a
+        <a href="{% url 'session_refresh' %}">In den Stapel mischen!</a
     </p>
+    {% endif %}
+
+    {% if preferences.session.has_x_cards_illknow > 0 %}
+        <div class="text-center">
+            {{ preferences.session.has_x_cards_illknow }} Karte(n), die ich heute noch knapp wissen sollte: 
+        </div> 
+        <div class="text-center mb-3">
+            <a class="btn btn-lg btn-danger" href="{% url 'prognosis_session' %}">Auf den Stapel & Training starten!</a>
+        </div>       
     {% endif %}
 
     <div class="text-center">

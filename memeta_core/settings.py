@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'memeta_app',
     'ckeditor',
     'members',
+    'bootstrap4',
+    'bootstrap_datepicker_plus',
 ]
 
 MIDDLEWARE = [
@@ -159,3 +161,21 @@ CKEDITOR_CONFIGS = {
     "height": "20rem",
     "width": "auto",
 }}
+
+# datepicker confics
+
+BOOTSTRAP_DATEPICKER_PLUS = {
+    "options": {
+        "locale": 'de_ch',
+        "showClose": True,
+        "showClear": True,
+        #"showTodayButton": True,
+        "allowInputToggle": True,
+        "focusOnShow": False,
+    },
+    "variant_options": {
+        "date": {
+            "format": "DD.MM.YYYY",
+        },
+    }
+}

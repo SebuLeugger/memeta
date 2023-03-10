@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
-from .models import Course, CardFront, CardBack, Card, Preferences, Session, Rep, SessionLog
-from .forms import AddCardFrontForm, AddCardBackForm, SetPreferencesForm, AddFrontForm, ChangePreferencesForm, RepFrontForm, RepBackForm
+from .models import Course, CardFront, CardBack, Card, Preferences, Session, Rep, SessionLog, IllKnow
+from .forms import AddCardFrontForm, AddCardBackForm, SetPreferencesForm, AddFrontForm, ChangePreferencesForm, RepFrontForm, RepBackForm, AddIllKnowForm
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.http import Http404
@@ -133,6 +133,11 @@ class CardBackView(DetailView):
             except Preferences.DoesNotExist:
                 pass
 
+            try:
+                context['latest_prognosis'] = self.request.user.illknow_set.filter(card=self.object.pk).latest('when').when.date()
+            except:
+                pass
+
         return context
 
 def rep_repeat_view(request, pk):
@@ -232,6 +237,11 @@ def create_session_view(request):
     for card in request.user.sorted_out_cards.all():
         pks_of_sorted_out_cards.append(card.pk)
     query &= ~Q(id__in=pks_of_sorted_out_cards)
+    pks_of_cards_with_undue_prognosis_date = []
+    for illknow in request.user.illknow_set.all():
+        if illknow.when > timezone.now():
+            pks_of_cards_with_undue_prognosis_date.append(illknow.card.pk)
+    query &= ~Q(id__in=pks_of_cards_with_undue_prognosis_date)
     candidate_cards_iterable = Card.objects.filter(query).order_by('?').all()
     card_pk_list = []
     for card in candidate_cards_iterable:
@@ -304,6 +314,34 @@ class RepRecapView(DetailView):
     model = Rep
     template_name = 'rep_recap.html'
 
+
+class AddIllKnowView(CreateView):
+    model = IllKnow
+    form_class = AddIllKnowForm
+    template_name = 'prognosis.html'
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        form.instance.card = Card.objects.get(pk=self.kwargs['card_pk'])
+        return super(AddIllKnowView, self).form_valid(form)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(AddIllKnowView, self).get_context_data()
+        card = Card.objects.get(pk=self.kwargs['card_pk'])
+        context['card'] = card
+        return context
+
+    def get_success_url(self):
+        return reverse('card_back', kwargs={'pk': self.kwargs['card_pk']})
+
+
+def add_card_view(request, *args, **kwargs):
+    front = get_object_or_404(CardFront, pk=kwargs['front_pk'])
+    back = get_object_or_404(CardBack, pk=kwargs['back_pk'])
+    card = Card(front=front, back=back, creator=back.creator, course=front.course)
+    card.save()
+    return HttpResponseRedirect(reverse('card_back', args=([card.pk])))
+
 class RepView(DetailView):
     model = Rep
     template_name = 'rep.html'
@@ -373,6 +411,18 @@ def remove_seen_cards_view(request):
                 request.user.preferences.session.card_pk_list_string = ','.join(pk_strings)
             request.user.preferences.session.save()
     return redirect('start_training')
+
+def prognosis_session_view(request):
+    if request.user.is_authenticated:
+        string = ''
+        for illknow in request.user.illknow_set.filter(when__date=timezone.now().date()):
+            string += str(illknow.card.pk) + ','
+        if request.user.preferences.session.card_pk_list_string == '':
+            request.user.preferences.session.card_pk_list_string += string[:-1]
+        else:            
+            request.user.preferences.session.card_pk_list_string = string + request.user.preferences.session.card_pk_list_string
+        request.user.preferences.session.save()
+    return redirect('create_rep')
 
 class SessionLogView(DetailView):    
     model = SessionLog

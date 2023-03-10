@@ -1,0 +1,71 @@
+{% extends 'base_training.html' %}
+
+{% block title %} 
+    Prognose
+{% endblock %}
+
+{% block content %}
+
+{% if user.is_authenticated %}
+
+    <div class="position-absolute top-0 end-0">
+        <a class="btn btn-light btn-sm" href="{% url 'card_back' card.pk %}">Abbrechen</a>
+    </div>
+
+    <br>
+
+    <div class="row">
+
+        <div class="col-sm-8 col-lg-6 mb-4">
+            <div class="card border-warning h-100">
+                <div class="card-header text-center bg-transparent border-light">
+                    <small class="text-muted">Karte #{{ card.pk }}</small>
+                </div>
+                <div class="card-body">
+                    <div class="card-text">{{ card.front.body|safe }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-8 col-lg-6 mb-4">
+            <div class="card border-info h-100">
+                <div class="card-header text-center bg-transparent border-light">
+                    <small class="text-muted">Kurs: {{ card.course }}</small>
+                </div>
+                <div class="card-body">
+                    {{ card.back.body|safe }}
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    {% load bootstrap4 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript jquery='full' %}
+    {{ form.media }}
+    
+    <div class="row">
+        <div class="col-md-4"></div>
+        <div class='col-md-4'>
+            <div class="form-group">
+                <form method="POST">
+                    {% csrf_token %}
+                    {% bootstrap_form form %} 
+                <button class="btn btn-primary">Prognose abgeben</button>
+                </form>
+            </div>               
+        </div>
+        <div class="col-md-4"></div>
+    </div>
+
+
+
+       
+
+
+{% else %} 
+    <p>Du musst <a href="{% url 'home' %}">registriert sein und dich einloggen</a> um Prognosen abzugeben.</p>
+{% endif %}
+
+{% endblock content %}

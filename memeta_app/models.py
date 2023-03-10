@@ -6,6 +6,7 @@ from django.urls import reverse
 from ckeditor.fields import RichTextField
 from django.core.validators import validate_comma_separated_integer_list
 from random import shuffle
+from django.utils import timezone
 
 
 #class Subject(models.Model): #z.B. Psychologie vs. Medizin
@@ -165,6 +166,21 @@ class Rep(models.Model):
         return str(self.user) + ' - ' +str(self.start_time.date()) + ' - "' +  self.card.front.body[3:19] + '..."'
         
 
+class IllKnow(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE,)
+    card = models.ForeignKey(Card, on_delete=models.PROTECT)
+    said_when = models.DateTimeField(auto_now_add=True)
+    when = models.DateTimeField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'card'], name='unique prognosis')
+        ]
+
+    def __str__(self):
+        return str(self.user) + ': "Ich weiss es noch am ' +str(self.when.date()) + ', d.h. ' +  str((self.when - self.said_when).days) + ' Tage später"'
+      
+
 class Session(models.Model):
     preferences = models.OneToOneField(Preferences, on_delete=models.CASCADE, primary_key=True)
     card_pk_list_string = models.TextField(validators=[validate_comma_separated_integer_list])
@@ -217,6 +233,12 @@ class Session(models.Model):
             return 0
         else: 
             return self.card_pk_list_string.count(',') +1 - self.next_list_position
+
+    def has_x_cards_illknow(self):
+        count = 0
+        for illknow in self.preferences.user.illknow_set.filter(when__date=timezone.now().date()):
+                count += 1
+        return count
 
     def has_x_new_cards(self):
         count = 0
