@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
-from .models import Course, CardFront, CardBack, Card, Preferences, Session, Rep, SessionLog, IllKnow
+from .models import Course, CardFront, CardBack, Card, Preferences, Session, Rep, SessionLog, IllKnow, HonoredIllKnow
 from .forms import AddCardFrontForm, AddCardBackForm, SetPreferencesForm, AddFrontForm, ChangePreferencesForm, RepFrontForm, RepBackForm, AddIllKnowForm
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -237,11 +237,10 @@ def create_session_view(request):
     for card in request.user.sorted_out_cards.all():
         pks_of_sorted_out_cards.append(card.pk)
     query &= ~Q(id__in=pks_of_sorted_out_cards)
-    pks_of_cards_with_undue_prognosis_date = []
+    pks_of_cards_with_bets = []
     for illknow in request.user.illknow_set.all():
-        if illknow.when > timezone.now():
-            pks_of_cards_with_undue_prognosis_date.append(illknow.card.pk)
-    query &= ~Q(id__in=pks_of_cards_with_undue_prognosis_date)
+        pks_of_cards_with_bets.append(illknow.card.pk)
+    query &= ~Q(id__in=pks_of_cards_with_bets)
     candidate_cards_iterable = Card.objects.filter(query).order_by('?').all()
     card_pk_list = []
     for card in candidate_cards_iterable:
@@ -300,6 +299,21 @@ class RepBackView(UpdateView):
 
     def form_valid(self, form):
         form.instance.back_seen = True
+        if self.object.user.illknow_set.filter(card=self.object.card):
+            illknow = self.object.user.illknow_set.filter(card=self.object.card)[0]
+            form.instance.honors_bet = True
+            honored_bet = HonoredIllKnow( 
+                user = illknow.user,
+                card = illknow.card,
+                said_when = illknow.said_when,
+                when = illknow.when,
+                #honored #auto_now_add
+                i_know = self.object.i_know,
+                i_knew = self.object.i_knew,
+                rep = self.object
+            )
+            honored_bet.save()
+            self.object.user.illknow_set.filter(card=self.object.card).delete()
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -415,7 +429,7 @@ def remove_seen_cards_view(request):
 def prognosis_session_view(request):
     if request.user.is_authenticated:
         string = ''
-        for illknow in request.user.illknow_set.filter(when__date=timezone.now().date()):
+        for illknow in request.user.illknow_set.filter(when__lte=timezone.now()):
             string += str(illknow.card.pk) + ','
         if request.user.preferences.session.card_pk_list_string == '':
             request.user.preferences.session.card_pk_list_string += string[:-1]

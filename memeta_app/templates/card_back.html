@@ -17,7 +17,14 @@ Karte {{card.pk}} Rückseite
             <a class="btn btn-sm"  style="float:right" href="{% url 'course' card.course.pk %}">{{ card.course }}</a>
         </div>
         <div class="card-body">
-            <div class="card-text">{{ card.back.body|safe }}</div>
+            <div class="card-text">
+                {% if latest_prognosis %}
+                    <p class="text-muted small"><em>Deine Wette:<br> "Was hier steht, kann ich mir bis am {{ latest_prognosis }} merken."</em></p>
+                    <p class="text-muted small">Mach ab {{ latest_prognosis }} ein Training, um diese Wette zu gewinnen!</p>
+                {% else %}
+                    {{ card.back.body|safe }}
+                {% endif %}
+            </div>
         </div>
         <div class="card-footer">
             <a href="{% url 'card_front' card.pk %}" class="btn btn-light btn-sm position-relative start-50 translate-middle-x">Vorderseite anzeigen</a>
@@ -119,10 +126,10 @@ Karte {{card.pk}} Rückseite
                             <button type="submit", name="card_id", value="{{ card.id }}", class="btn btn-light btn-sm">Entfernen</button>
                         </form>
                         {% else %}
-                        <a type="button" class="btn btn-warning btn-sm" href='{% url 'prognosis' card.pk %}'>Später reinmischen</a>
+                        <a type="button" class="btn btn-warning btn-sm" href='{% url 'prognosis' card.pk %}'>Wetten, dass...</a>
                         <form action="{% url 'card_into_deck' card.pk %}" method="POST">
                             {% csrf_token %}
-                            <button type="submit", name="card_id", value="{{ card.id }}", class="btn btn-light btn-sm">Jetzt reinmischen</button>
+                            <button type="submit", name="card_id", value="{{ card.id }}", class="btn btn-light btn-sm">In den Stapel mischen</button>
                         </form>
                         <form action="{% url 'sort_out_card' card.pk %}" method="POST">
                             {% csrf_token %}

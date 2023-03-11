@@ -35,7 +35,13 @@
 
     {% if preferences.session.has_x_cards_illknow > 0 %}
         <div class="text-center">
-            {{ preferences.session.has_x_cards_illknow }} Karte(n), die ich heute noch knapp wissen sollte: 
+            {{ preferences.session.has_x_cards_illknow }} 
+            {% if preferences.session.has_x_cards_illknow > 1 %}
+                Karten, zu denen du Wetten
+            {% else %}
+                Karte, zu der du eine Wette
+            {% endif %}    
+            abgeschlossen hast:
         </div> 
         <div class="text-center mb-3">
             <a class="btn btn-lg btn-danger" href="{% url 'prognosis_session' %}">Auf den Stapel & Training starten!</a>

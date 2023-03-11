@@ -154,20 +154,21 @@ class Preferences(models.Model):
         return reverse('start_training')
 
 class Rep(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE,)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     card = models.ForeignKey(Card, on_delete=models.PROTECT)
     start_time = models.DateTimeField(auto_now_add=True)
     end_time = models.DateTimeField(auto_now=True, null=True)
     i_know = models.BooleanField(default=False)
     i_knew = models.BooleanField(default=False)
     back_seen = models.BooleanField(default=False)
+    honors_bet = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.user) + ' - ' +str(self.start_time.date()) + ' - "' +  self.card.front.body[3:19] + '..."'
         
 
 class IllKnow(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE,)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     card = models.ForeignKey(Card, on_delete=models.PROTECT)
     said_when = models.DateTimeField(auto_now_add=True)
     when = models.DateTimeField()
@@ -179,7 +180,19 @@ class IllKnow(models.Model):
 
     def __str__(self):
         return str(self.user) + ': "Ich weiss es noch am ' +str(self.when.date()) + ', d.h. ' +  str((self.when - self.said_when).days) + ' Tage später"'
-      
+
+class HonoredIllKnow(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    card = models.ForeignKey(Card, on_delete=models.PROTECT)
+    said_when = models.DateTimeField()
+    when = models.DateTimeField()
+    honored = models.DateTimeField(auto_now_add=True)
+    i_know = models.BooleanField()
+    i_knew = models.BooleanField()
+    rep = models.ForeignKey(Rep, on_delete=models.PROTECT) #this field should be obsolete, or the i_know, i_knew, user and card fields are jointly obsolete, but I don't trust my code, so I'll add a few redundancies. (Reps can be changed after the fact if users use their browsers' back buttons - this shouldn't be possible, but it is, the way I hacked this thing together)
+
+    def __str__(self):
+        return str(self.user) + ': ' + str(self.i_knew) + ': "Ich weiss es noch ' +  str((self.when - self.said_when).days) + ' Tage später" - Geehrt am ' + str(self.honored.date()) + ', ' + str((self.honored - self.when).days) + ' Tage nach Fälligkeit der Wette'
 
 class Session(models.Model):
     preferences = models.OneToOneField(Preferences, on_delete=models.CASCADE, primary_key=True)
@@ -236,7 +249,7 @@ class Session(models.Model):
 
     def has_x_cards_illknow(self):
         count = 0
-        for illknow in self.preferences.user.illknow_set.filter(when__date=timezone.now().date()):
+        for illknow in self.preferences.user.illknow_set.filter(when__lte=timezone.now()):
                 count += 1
         return count
 

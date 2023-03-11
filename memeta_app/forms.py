@@ -113,8 +113,8 @@ class AddIllKnowForm(forms.ModelForm):
         model = IllKnow
         fields = ('when',)
         labels = {
-            'when': 'Wann weisst du das gerade noch knapp?',
+            'when': '"Was hier steht, kann ich mir merken bis am..."',
         }
         widgets = {
-            'when': DatePickerInput(options={"format": "DD.MM.YYYY"}),
+            'when': DatePickerInput(options={"format": "DD.MM.YYYY"}, attrs={'placeholder': 'Datum auswählen...'}),
         }
