@@ -18,9 +18,9 @@ Karte {{card.pk}} Rückseite
         </div>
         <div class="card-body">
             <div class="card-text">
-                {% if latest_prognosis %}
-                    <p class="text-muted small"><em>Deine Wette:<br> "Was hier steht, kann ich mir bis am {{ latest_prognosis }} merken."</em></p>
-                    <p class="text-muted small">Mach ab {{ latest_prognosis }} ein Training, um diese Wette zu gewinnen!</p>
+                {% if illknow %}
+                    <p class="text-muted small"><em>Deine Wette:<br> "Was hier steht, kann ich mir bis am {{ illknow.when.date }} merken."</em></p>
+                    <p class="text-muted small">Mach ab {{ illknow.when.date }} ein Training, um diese Wette zu gewinnen!</p>
                 {% else %}
                     {{ card.back.body|safe }}
                 {% endif %}
@@ -109,9 +109,9 @@ Karte {{card.pk}} Rückseite
     
         {% if user.preferences %}
             {% if user not in card.sorted_out_by.all %}
-                {% if latest_prognosis %}
+                {% if illknow %}
                     <div class="text-muted">
-                        <small>Wird dir ab {{ latest_prognosis }} fürs Training vorgeschlagen</small><br>
+                        <small>Wird dir ab {{ illknow.when.date }} fürs Training vorgeschlagen</small><br>
                     </div>
                 {% else %}
                     {% if in_deck > 0 %}

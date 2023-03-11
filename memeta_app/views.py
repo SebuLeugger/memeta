@@ -134,7 +134,7 @@ class CardBackView(DetailView):
                 pass
 
             try:
-                context['latest_prognosis'] = self.request.user.illknow_set.filter(card=self.object.pk).latest('when').when.date()
+                context['illknow'] = self.request.user.illknow_set.get(card=self.object.pk) # is unique
             except:
                 pass
 
@@ -300,7 +300,7 @@ class RepBackView(UpdateView):
     def form_valid(self, form):
         form.instance.back_seen = True
         if self.object.user.illknow_set.filter(card=self.object.card):
-            illknow = self.object.user.illknow_set.filter(card=self.object.card)[0]
+            illknow = self.object.user.illknow_set.get(card=self.object.card) # is unique
             form.instance.honors_bet = True
             honored_bet = HonoredIllKnow( 
                 user = illknow.user,
@@ -313,7 +313,7 @@ class RepBackView(UpdateView):
                 rep = self.object
             )
             honored_bet.save()
-            self.object.user.illknow_set.filter(card=self.object.card).delete()
+            self.object.user.illknow_set.get(card=self.object.card).delete()
         return super().form_valid(form)
 
     def get_success_url(self):
