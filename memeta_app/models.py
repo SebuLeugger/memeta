@@ -7,7 +7,6 @@ from ckeditor.fields import RichTextField
 from django.core.validators import validate_comma_separated_integer_list
 from random import shuffle
 from django.utils import timezone
-from datetime import timedelta
 
 
 #class Subject(models.Model): #z.B. Psychologie vs. Medizin
@@ -183,10 +182,10 @@ class IllKnow(models.Model):
         ]
     
     def daysdelta(self):
-        return ((self.when - self.said_when) + timedelta(minutes=10)).days
+        return (self.when.date() - self.said_when.date()).days
     
     def days_from_now(self):
-        return ((self.when - timezone.now()) + timedelta(minutes=10)).days
+        return (self.when.date() - timezone.localdate()).days
 
     def __str__(self):
         return str(self.user) + ': "Ich weiss es noch am ' +str(self.when.date()) + ', d.h. ' +  str((self.when.date() - self.said_when.date()).days) + ' Tage später"'
@@ -202,10 +201,10 @@ class HonoredIllKnow(models.Model):
     rep = models.ForeignKey(Rep, on_delete=models.PROTECT) #this field should be obsolete, or the i_know, i_knew, user and card fields are jointly obsolete, but I don't trust my code, so I'll add a few redundancies. (Reps can be changed after the fact if users use their browsers' back buttons - this shouldn't be possible, but it is, the way I hacked this thing)
 
     def daysdelta_bet(self):
-        return ((self.when - self.said_when) + timedelta(minutes=10)).days
+        return (self.when.date() - self.said_when.date()).days
 
     def daysdelta_honor(self):
-        return ((self.honored - self.said_when) + timedelta(minutes=10)).days
+        return (self.honored.date() - self.said_when.date()).days
 
     # quite arbitrary cut-off point: 
     def underconfident(self):

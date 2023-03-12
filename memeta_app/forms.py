@@ -121,6 +121,4 @@ class AddIllKnowForm(forms.ModelForm):
         # I'm using dateTIMEpicker but don't let the user choose a time (by not including the time in the "format")
         # Instead I set the time to useCurrent = True. 
         # This way, choosing only the date doesn't automatically set the time to 00:00:00 local time of that chosen date
-        # We would still have to round the datetime object UP to the nearest day to get the required amount of days as an integer (23h59min is 0 days...)
-        # but since I plan to display the exact timespans of bets in a graph I will not implement this rounding-up properly
-        # I'm just hacking it with a timedalta of 10 minutes added to each time difference for frontend display, such that all normal submit delays after timeinput widget uses should be fine
+        # if we subtract not the datetime objects themselves from each other but instead the dates of the datetime objects only, we get the intuitively right amount of days in the daydelta functions, even though the daydelta is less than the full multiple of 24h.
