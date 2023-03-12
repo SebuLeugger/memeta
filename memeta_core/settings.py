@@ -172,10 +172,11 @@ BOOTSTRAP_DATEPICKER_PLUS = {
         #"showTodayButton": True,
         "allowInputToggle": True,
         "focusOnShow": False,
+        "useCurrent": True
     },
     "variant_options": {
         "date": {
-            "format": "DD.MM.YYYY",
+            "format": "DD.MM.YYYY HH.mm",
         },
     }
 }

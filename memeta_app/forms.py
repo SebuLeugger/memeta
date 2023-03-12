@@ -1,6 +1,6 @@
 from django import forms
 from .models import CardFront, CardBack, Card, Preferences, Rep, IllKnow
-from bootstrap_datepicker_plus.widgets import DatePickerInput
+from bootstrap_datepicker_plus.widgets import DateTimePickerInput
 
 
 
@@ -116,5 +116,11 @@ class AddIllKnowForm(forms.ModelForm):
             'when': '"Was hier steht, kann ich mir merken bis am..."',
         }
         widgets = {
-            'when': DatePickerInput(options={"format": "DD.MM.YYYY"}, attrs={'placeholder': 'Datum auswählen...'}),
+            'when': DateTimePickerInput(options={"format": "DD.MM.YYYY", "useCurrent": True}, attrs={'placeholder': 'Datum auswählen...'}),
         }
+        # I'm using dateTIMEpicker but don't let the user choose a time (by not including the time in the "format")
+        # Instead I set the time to useCurrent = True. 
+        # This way, choosing only the date doesn't automatically set the time to 00:00:00 local time of that chosen date
+        # We would still have to round the datetime object UP to the nearest day to get the required amount of days as an integer (23h59min is 0 days...)
+        # but since I plan to display the exact timespans of bets in a graph I will not implement this rounding-up properly
+        # I'm just hacking it with a timedalta of 10 minutes added to each time difference for frontend display, such that all normal submit delays after timeinput widget uses should be fine

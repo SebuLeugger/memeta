@@ -19,8 +19,12 @@ Karte {{card.pk}} Rückseite
         <div class="card-body">
             <div class="card-text">
                 {% if illknow %}
-                    <p class="text-muted small"><em>Deine Wette:<br> "Was hier steht, kann ich mir bis am {{ illknow.when.date }} merken."</em></p>
-                    <p class="text-muted small">Mach ab {{ illknow.when.date }} ein Training, um diese Wette zu gewinnen!</p>
+                    <div class="bg-dark text-warning px-3 py-2">
+                    <h5 class="text-center">Zensiert ;-)</h5>
+                    <p class="small">Deine Wette:<br><em>"Was hier steht, kann ich mir bis am {{ illknow.when.date }} merken."</em></p>
+                    <p class="small">Mach ab {{ illknow.when.date }} ein Training, um diese Wette zu gewinnen!</p>
+                    <!--<p class="text-center"><a class="btn btn-outline-warning" href="">Mogeln...</a></p>-->
+                    </div>
                 {% else %}
                     {{ card.back.body|safe }}
                 {% endif %}

@@ -428,12 +428,21 @@ def remove_seen_cards_view(request):
 
 def prognosis_session_view(request):
     if request.user.is_authenticated:
+        due_bets = request.user.illknow_set.filter(when__lte=timezone.now())
         string = ''
-        for illknow in request.user.illknow_set.filter(when__lte=timezone.now()):
+        for illknow in due_bets:
             string += str(illknow.card.pk) + ','
         if request.user.preferences.session.card_pk_list_string == '':
-            request.user.preferences.session.card_pk_list_string += string[:-1]
-        else:            
+            request.user.preferences.session.card_pk_list_string = string[:-1]
+        else:
+            pk_strings = request.user.preferences.session.card_pk_list_string.split(',')
+            doubles = False
+            for illknow in due_bets:
+                if str(illknow.card.pk) in pk_strings:
+                    doubles = True
+                    pk_strings = [string for string in pk_strings if string != str(illknow.card.pk)]
+            if doubles:
+                request.user.preferences.session.card_pk_list_string = ','.join(pk_strings)
             request.user.preferences.session.card_pk_list_string = string + request.user.preferences.session.card_pk_list_string
         request.user.preferences.session.save()
     return redirect('create_rep')

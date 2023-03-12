@@ -7,6 +7,32 @@ Profil {{ user }}
 {% block content %}
 <h1><em>{{ user }}:</em></h1>
 
+<h4>
+    Metagedächtnis-Wetten:
+</h4>
+<p>
+    Ich habe {{ user.illknow_set.count }} Wetten am Laufen:
+    <br>
+    {% for bet in user.illknow_set.all %}
+        <a class='btn rounded-pill btn-warning btn-sm' href="{% url 'card_front' bet.card.pk %}"><small><sub>{{ bet.days_from_now }}</sub></small>{{ bet.daysdelta }}</a>
+    {% endfor %}
+    <br><small class="text-muted"><sub>Tiefgestellte Zahl</sub>: Tage, bis die Wette fällig wird
+    <br>Grosse Zahl: gewettetes Behaltens-Intervall in Tagen
+    </small>
+</p>
+<p>
+    Ich habe {{ user.honoredillknow_set.count }} Wetten eingelöst: 
+    <br>
+    {% for bet in user.honoredillknow_set.all %}
+        <a class='btn rounded-pill {% if bet.i_knew %}btn-{% if not bet.i_know %}outline-{% endif %}success{% else %}btn-{% if not bet.i_know %}outline-{% endif %}danger{%endif%} btn-sm' href="{% url 'rep' bet.rep.pk %}">{{ bet.daysdelta_bet }}{% if bet.underconfident %}<sub>u</sub>{% elif bet.overconfident %}<sup>ü</sup>{% elif not bet.i_knew %}<sup>?</sup>{% else %}<small><sub>&#x2713;</sub></small>{% endif %}</a>
+    {% endfor %}
+    <br><small class="text-muted">X<sup>ü</sup> Behaltens-Intervall überschätzt
+    <br>X<sub>u</sub> Behaltens-Intervall unterschätzt
+    <br>X<sup>?</sup> Wette zu lange nach Fälligkeit eingelöst</small>
+</p>
+
+<hr>
+
 <div>
     Es gibt {{ user.card_set.count }} Karte{% if user.card_set.count != 1 %}n{% endif %} mit {% if user.card_set.count == 1 %}einer{% endif %} Rückseite{% if user.card_set.count != 1 %}n{% endif %} von mir:
 </div>

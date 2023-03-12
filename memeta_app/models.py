@@ -7,6 +7,7 @@ from ckeditor.fields import RichTextField
 from django.core.validators import validate_comma_separated_integer_list
 from random import shuffle
 from django.utils import timezone
+from datetime import timedelta
 
 
 #class Subject(models.Model): #z.B. Psychologie vs. Medizin
@@ -129,6 +130,9 @@ class Preferences(models.Model):
                 not_known.pop(card_pk, None)
         except Session.DoesNotExist:
             pass
+        # Don't show cards with open bets on them; they are suggested when the time is right by a different function
+        for bet in self.user.illknow_set.all():
+            not_known.pop(bet.card.pk, None)
         return not_known
 
     def last_rep_per_card(self): 
@@ -177,9 +181,15 @@ class IllKnow(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['user', 'card'], name='unique prognosis')
         ]
+    
+    def daysdelta(self):
+        return ((self.when - self.said_when) + timedelta(minutes=10)).days
+    
+    def days_from_now(self):
+        return ((self.when - timezone.now()) + timedelta(minutes=10)).days
 
     def __str__(self):
-        return str(self.user) + ': "Ich weiss es noch am ' +str(self.when.date()) + ', d.h. ' +  str((self.when - self.said_when).days) + ' Tage später"'
+        return str(self.user) + ': "Ich weiss es noch am ' +str(self.when.date()) + ', d.h. ' +  str((self.when.date() - self.said_when.date()).days) + ' Tage später"'
 
 class HonoredIllKnow(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -189,7 +199,29 @@ class HonoredIllKnow(models.Model):
     honored = models.DateTimeField(auto_now_add=True)
     i_know = models.BooleanField()
     i_knew = models.BooleanField()
-    rep = models.ForeignKey(Rep, on_delete=models.PROTECT) #this field should be obsolete, or the i_know, i_knew, user and card fields are jointly obsolete, but I don't trust my code, so I'll add a few redundancies. (Reps can be changed after the fact if users use their browsers' back buttons - this shouldn't be possible, but it is, the way I hacked this thing together)
+    rep = models.ForeignKey(Rep, on_delete=models.PROTECT) #this field should be obsolete, or the i_know, i_knew, user and card fields are jointly obsolete, but I don't trust my code, so I'll add a few redundancies. (Reps can be changed after the fact if users use their browsers' back buttons - this shouldn't be possible, but it is, the way I hacked this thing)
+
+    def daysdelta_bet(self):
+        return ((self.when - self.said_when) + timedelta(minutes=10)).days
+
+    def daysdelta_honor(self):
+        return ((self.honored - self.said_when) + timedelta(minutes=10)).days
+
+    # quite arbitrary cut-off point: 
+    def underconfident(self):
+        if self.i_knew:
+            if (self.honored - self.said_when) / (self.when - self.said_when) >= 5/4:
+                return True
+        else:
+            return None # not "False" because we may not know
+    
+    # quite arbitrary cut-off point: 
+    def overconfident(self):
+        if not self.i_knew:
+            if (self.honored - self.said_when) / (self.when - self.said_when) <= 5/4:
+                return True
+        else:
+            return None # not "False" because we may not know
 
     def __str__(self):
         return str(self.user) + ': ' + str(self.i_knew) + ': "Ich weiss es noch ' +  str((self.when - self.said_when).days) + ' Tage später" - Geehrt am ' + str(self.honored.date()) + ', ' + str((self.honored - self.when).days) + ' Tage nach Fälligkeit der Wette'
