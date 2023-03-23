@@ -62,22 +62,28 @@
                 {% endif %}
             {% endif %}
         </p>
-       
-        {% if user.preferences.session.deck_size >= 1 %}
+        {% if illknow %}
+            <p class="text-muted small text-center">Wird dir ab {{ illknow.when.date }} wieder fürs Training vorgeschlagen</p>
+        {% endif %}
+
             <div class="text-center">
+        {% if not illknow %}
+                <a href="{% url 'prognosis' card_pk=rep.card.pk rep_pk=rep.pk %}" class="btn btn-info">Wetten, dass...</a>
+        {% endif %}
+        {% if user.preferences.session.deck_size >= 1 %}
                 <a class="btn btn-warning btn-lg" href="{% url 'create_rep' %}">Nächste Karte ziehen</a>
             </div>
             <div class="text-center">
                 Noch {{ user.preferences.session.deck_size }} Karte{% if user.preferences.session.deck_size != 1 %}n{% endif %} auf dem Stapel
             </div>
         {% else %}
-            <div class="text-center">
                 <a class="btn btn-sm btn-warning" href="{% url 'session_overview' user.pk %}">Training beenden?</a>
             </div>
             <div class="text-center">
                 Der Stapel ist leer!
             </div>
         {% endif %}
+
 
         <br>
         <div class="text-center">

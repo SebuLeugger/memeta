@@ -48,9 +48,15 @@
             <div class="form-group">
                 <form method="POST">
                     {% csrf_token %}
-                    {% bootstrap_form form %} 
-                <button class="btn btn-warning">Wette abschliessen</button>
-                <a class="btn btn-light btn-sm" href="{% url 'card_back' card.pk %}">Abbrechen</a>
+                    {% bootstrap_form form %}
+                    
+                    {% if rep_pk == 0 %}
+                        <button type="submit" name="not_rep" class="btn btn-warning">Wette abschliessen</button>
+                        <a class="btn btn-light btn-sm" href="{% url 'card_back' card.pk %}">Abbrechen</a>
+                    {% else %}
+                        <button type="submit" name="rep"  class="btn btn-warning">rep Wette abschliessen</button>
+                        <a class="btn btn-light btn-sm" href="{% url 'recap' rep_pk %}">rep Abbrechen</a>
+                    {% endif %}
                 </form>
             </div>               
         </div>

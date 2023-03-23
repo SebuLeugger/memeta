@@ -44,7 +44,7 @@
             abgeschlossen hast:
         </div> 
         <div class="text-center mb-3">
-            <a class="btn btn-lg btn-danger" href="{% url 'prognosis_session' %}">Auf den Stapel & Training starten!</a>
+            <a class="btn btn-lg btn-danger" href="{% url 'prognosis_session' %}">Zuoberst auf den Stapel & starten!</a>
         </div>       
     {% endif %}
 
@@ -67,7 +67,7 @@
         <a class="btn btn-sm btn-light" href="{% url 'remove_seen_cards' %}">Aussortieren, falls Rückseite kürzlich gesehen</a>
     </div>
 
-    {% if preferences.not_known_last_time|length > 0%}
+    {% if preferences.not_known_last_time|length > 0 %}
         <h4>Repe?</h4>
         <p>Bei {% if preferences.not_known_last_time|length == 1 %} dieser Karte {% else %} diesen {{ preferences.not_known_last_time|length }} Karten {% endif %} warst du letztes Mal unsicher:
             <br>

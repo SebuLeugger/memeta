@@ -39,9 +39,10 @@
                 <div class="card-footer text-center">
                     {{ form.as_p }}
                     <div>
-                        <input type="submit" name="recap" value="Kurs?" class="btn btn-info">
+                        <input type="submit" name="recap" value="Info" class="btn btn-sm btn-outline-info">
+                        <input type="submit" name="illknow" value="Wetten..." class="btn btn-lg btn-info">
                     {% if user.preferences.session.deck_size >= 1 %}
-                        <input type="submit" name="nextcard" value="Nächste Karte ziehen" class="btn btn-lg btn-warning">
+                        <input type="submit" name="nextcard" value="Nächste Karte" class="btn btn-warning">
                     </div>
                         <div class="text-center">
                             Noch {{ user.preferences.session.deck_size }} Karte{% if user.preferences.session.deck_size != 1 %}n{% endif %} auf dem Stapel

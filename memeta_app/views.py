@@ -321,12 +321,22 @@ class RepBackView(UpdateView):
             return 'recap'
         elif 'overview' in self.request.POST:
             return '/session-overview/' + str(self.request.user.pk)
+        elif 'illknow' in self.request.POST:
+            return '/card/' + str(self.object.card.pk) + '/prognosis/' + str(self.object.pk)
         else: # i.e. if 'nextcard' in request.POST
             return '/rep/create'
 
 class RepRecapView(DetailView):
     model = Rep
     template_name = 'rep_recap.html'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(RepRecapView, self).get_context_data()
+        try:
+            context['illknow'] = self.request.user.illknow_set.get(card=self.object.card.pk) # is unique
+        except:
+            pass
+        return context
 
 
 class AddIllKnowView(CreateView):
@@ -343,10 +353,17 @@ class AddIllKnowView(CreateView):
         context = super(AddIllKnowView, self).get_context_data()
         card = Card.objects.get(pk=self.kwargs['card_pk'])
         context['card'] = card
+
+        rep_pk = self.kwargs['rep_pk']
+        context['rep_pk'] = rep_pk
         return context
 
     def get_success_url(self):
-        return reverse('card_back', kwargs={'pk': self.kwargs['card_pk']})
+        if 'not_rep' in self.request.POST:
+            return reverse('card_back', kwargs={'pk': self.kwargs['card_pk']})
+        else: # i.e. if 'rep' in request.POST
+            return reverse('recap', kwargs={'pk': self.kwargs['rep_pk']})
+        
 
 
 def add_card_view(request, *args, **kwargs):
@@ -435,6 +452,7 @@ def prognosis_session_view(request):
         if request.user.preferences.session.card_pk_list_string == '':
             request.user.preferences.session.card_pk_list_string = string[:-1]
         else:
+            # remove [cards with due bets] from the deck, if they're already inside
             pk_strings = request.user.preferences.session.card_pk_list_string.split(',')
             doubles = False
             for illknow in due_bets:
@@ -443,6 +461,7 @@ def prognosis_session_view(request):
                     pk_strings = [string for string in pk_strings if string != str(illknow.card.pk)]
             if doubles:
                 request.user.preferences.session.card_pk_list_string = ','.join(pk_strings)
+            # put [cards with due bets] on top of the deck
             request.user.preferences.session.card_pk_list_string = string + request.user.preferences.session.card_pk_list_string
         request.user.preferences.session.save()
     return redirect('create_rep')

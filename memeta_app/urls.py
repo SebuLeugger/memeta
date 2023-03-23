@@ -50,7 +50,7 @@ urlpatterns = [
     path('rep/<int:pk>/recap', RepRecapView.as_view(), name='recap'),
     path('rep/<int:pk>/', RepView.as_view(), name='rep'),
     
-    path('card/<int:card_pk>/prognosis', AddIllKnowView.as_view(), name='prognosis'),
+    path('card/<int:card_pk>/prognosis/<int:rep_pk>', AddIllKnowView.as_view(), name='prognosis'),
     path('prognosis-session', prognosis_session_view, name='prognosis_session'),
 
     path('profile/<int:pk>', UserProfileView.as_view(), name='profile'),

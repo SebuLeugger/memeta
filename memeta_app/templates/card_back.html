@@ -130,7 +130,7 @@ Karte {{card.pk}} Rückseite
                             <button type="submit", name="card_id", value="{{ card.id }}", class="btn btn-light btn-sm">Entfernen</button>
                         </form>
                         {% else %}
-                        <a type="button" class="btn btn-warning btn-sm" href='{% url 'prognosis' card.pk %}'>Wetten, dass...</a>
+                        <a type="button" class="btn btn-warning btn-sm" href='{% url 'prognosis' card_pk=card.pk rep_pk="0" %}'>Wetten, dass...</a>
                         <form action="{% url 'card_into_deck' card.pk %}" method="POST">
                             {% csrf_token %}
                             <button type="submit", name="card_id", value="{{ card.id }}", class="btn btn-light btn-sm">In den Stapel mischen</button>
