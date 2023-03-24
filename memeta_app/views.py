@@ -307,6 +307,7 @@ class RepBackView(UpdateView):
                 card = illknow.card,
                 said_when = illknow.said_when,
                 when = illknow.when,
+                probable = illknow.probable,
                 #honored #auto_now_add
                 i_know = self.object.i_know,
                 i_knew = self.object.i_knew,

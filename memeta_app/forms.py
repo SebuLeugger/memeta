@@ -111,12 +111,14 @@ class RepBackForm(forms.ModelForm):
 class AddIllKnowForm(forms.ModelForm):
     class Meta:
         model = IllKnow
-        fields = ('when',)
+        fields = ('when', 'probable')
         labels = {
-            'when': '"Was hier steht, kann ich mir merken bis am..."',
+            'when': 'Karte wieder zum Training vorschlagen am...',
+            'probable': 'So sicher bin ich, dass ich es dann noch weiss:',
         }
         widgets = {
             'when': DateTimePickerInput(options={"format": "DD.MM.YYYY", "useCurrent": True}, attrs={'placeholder': 'Datum auswählen...'}),
+            'probable': forms.RadioSelect(),
         }
         # I'm using dateTIMEpicker but don't let the user choose a time (by not including the time in the "format")
         # Instead I set the time to useCurrent = True. 

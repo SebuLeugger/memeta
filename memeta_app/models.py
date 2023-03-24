@@ -171,10 +171,18 @@ class Rep(models.Model):
         
 
 class IllKnow(models.Model):
+    PERCENT_CHOICES = (
+        (1, '1%'),
+        (25, '25%'),
+        (50, '50%'),
+        (75, '75%'),
+        (99, '99%'),
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     card = models.ForeignKey(Card, on_delete=models.PROTECT)
     said_when = models.DateTimeField(auto_now_add=True)
     when = models.DateTimeField()
+    probable = models.SmallIntegerField(choices=PERCENT_CHOICES, default=None)
 
     class Meta:
         constraints = [
@@ -191,10 +199,18 @@ class IllKnow(models.Model):
         return str(self.user) + ': "Ich weiss es noch am ' +str(self.when.date()) + ', d.h. ' +  str((self.when.date() - self.said_when.date()).days) + ' Tage später"'
 
 class HonoredIllKnow(models.Model):
+    PERCENT_CHOICES = (
+        (1, '1%'),
+        (25, '25%'),
+        (50, '50%'),
+        (75, '75%'),
+        (99, '99%'),
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     card = models.ForeignKey(Card, on_delete=models.PROTECT)
     said_when = models.DateTimeField()
     when = models.DateTimeField()
+    probable = models.SmallIntegerField(choices=PERCENT_CHOICES)
     honored = models.DateTimeField(auto_now_add=True)
     i_know = models.BooleanField()
     i_knew = models.BooleanField()

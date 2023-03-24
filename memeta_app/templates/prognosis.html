@@ -11,6 +11,34 @@
 
     <br>
 
+    {% load bootstrap4 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript jquery='full' %}
+    {{ form.media }}
+    
+    <div class="row">
+        <div class="col-md-4"></div>
+        <div class='col-md-4'>
+            <div class="form-group">
+                <form method="POST">
+                    {% csrf_token %}
+                    {% bootstrap_form form %}
+                    
+                    {% if rep_pk == 0 %}
+                        <button type="submit" name="not_rep" class="btn btn-warning">Wette abschliessen</button>
+                        <a class="btn btn-light btn-sm" href="{% url 'card_back' card.pk %}">Abbrechen</a>
+                    {% else %}
+                        <button type="submit" name="rep"  class="btn btn-warning">Wette abschliessen</button>
+                        <a class="btn btn-light btn-sm" href="{% url 'recap' rep_pk %}">Abbrechen</a>
+                    {% endif %}
+                </form>
+            </div>               
+        </div>
+        <div class="col-md-4"></div>
+    </div>
+
+    <br>
+
     <div class="row">
 
         <div class="col-sm-8 col-lg-6 mb-4">
@@ -35,32 +63,6 @@
             </div>
         </div>
 
-    </div>
-
-    {% load bootstrap4 %}
-    {% bootstrap_css %}
-    {% bootstrap_javascript jquery='full' %}
-    {{ form.media }}
-    
-    <div class="row">
-        <div class="col-md-4"></div>
-        <div class='col-md-4'>
-            <div class="form-group">
-                <form method="POST">
-                    {% csrf_token %}
-                    {% bootstrap_form form %}
-                    
-                    {% if rep_pk == 0 %}
-                        <button type="submit" name="not_rep" class="btn btn-warning">Wette abschliessen</button>
-                        <a class="btn btn-light btn-sm" href="{% url 'card_back' card.pk %}">Abbrechen</a>
-                    {% else %}
-                        <button type="submit" name="rep"  class="btn btn-warning">rep Wette abschliessen</button>
-                        <a class="btn btn-light btn-sm" href="{% url 'recap' rep_pk %}">rep Abbrechen</a>
-                    {% endif %}
-                </form>
-            </div>               
-        </div>
-        <div class="col-md-4"></div>
     </div>
 
 
